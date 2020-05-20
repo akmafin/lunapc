@@ -160,7 +160,12 @@ void RandomInit(struct maindata *lunadata) {
 }
 
 void RandomGet(struct maindata *lunadata) {
-	lunadata->RandomNum = (lunadata->RandomNum + 1) & 0xFF;
+	lunadata->RandomNumState ^= lunadata->RandomNumState << 13;
+	lunadata->RandomNumState ^= lunadata->RandomNumState >> 17;
+	lunadata->RandomNumState ^= lunadata->RandomNumState << 5;
+	lunadata->RandomNum = lunadata->RandomNumState & 0xFF;
+	if(lunadata->RandomNum > 0x80)
+		lunadata->RandomNum -= 0x100;
 }
 
 void DrawHighscore(struct maindata *lunadata) {
