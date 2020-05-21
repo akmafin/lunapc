@@ -5,6 +5,8 @@ void MapInit(maindata *lunadata) {
 	MapChangeMapColors(lunadata);
 	ClearScreen(lunadata);
 	ClearColor(lunadata);
+	for(int i = 0; i < 40; i++)
+		lunadata->SCREEN[24 * 40 + i] = 0;
 	lunadata->map.HscrollSpeed = 1;
 	lunadata->map.MinGap = 16;
 	lunadata->map.CeilHeight = 0;
@@ -121,7 +123,7 @@ void MapGenerateColumn(maindata *lunadata) {
 		x--;
 	}
 	lunadata->map.ColData[lunadata->map.CeilHeight - 1] = 132;
-// CHECK BELOW
+
 	// Apply floor
 	mod = 24 - lunadata->map.FloorHeight;
 	if(lunadata->map.FloorDir < 0)
@@ -134,11 +136,8 @@ void MapGenerateColumn(maindata *lunadata) {
 	x = lunadata->map.FloorHeight;
 	if(lunadata->map.FloorDir < 0) {
 		x++;
-	} else {
-		x--;
-		lunadata->map.ColData[mod + x] = ch;
 	}
-	while (x > 0) {
+	do {
 		if(x == 1) {
 			if(lunadata->map.FloorDir > 0) {
 				ch = lunadata->map.GrassTop[2];
@@ -151,24 +150,29 @@ void MapGenerateColumn(maindata *lunadata) {
 			}
 		}
 		x--;
-		lunadata->map.ColData[mod + x] = ch;
-	}
+		if(x >= 0)
+			lunadata->map.ColData[mod + x] = ch;
+	} while(x >= 0);
 	
 	// Decorate floor
-	if(lunadata->map.DecorateType == 3) {
+	x = 0;
+	if(lunadata->map.DecorateType != 3) {
 		RandomGet(lunadata);
-		if(lunadata->RandomNum < 0) {
-			RandomGet(lunadata);
-			lunadata->map.DecorateType = lunadata->RandomNum & 3;
-		}
+		if(lunadata->RandomNum < 0)
+			x = 1;
+	} else
+		x = 1;
+	if(x) {
+		RandomGet(lunadata);
+		lunadata->map.DecorateType = lunadata->RandomNum & 3;
 	}
-	if((lunadata->map.FloorHeight > 0) && (lunadata->map.FloorDir == 0)) {
+	if((lunadata->map.FloorHeight != 0) && (lunadata->map.FloorDir == 0)) {
 		lunadata->map.ColData[mod - 1] = lunadata->map.DecorateTypeChars[lunadata->map.DecorateType];
 	}
 	
 	// Fix ceiling
 	if(lunadata->map.CeilHeight != lunadata->map.PrevCeilHeight) {
-		if(lunadata->map.CeilHeight < lunadata->map.PrevCeilHeight)
+		if(lunadata->map.PrevCeilHeight >= lunadata->map.CeilHeight)
 			lunadata->map.ColData[lunadata->map.CeilHeight] = lunadata->map.CeilTop[2];
 		else
 			lunadata->map.ColData[lunadata->map.CeilHeight - 1] = lunadata->map.CeilTop[0];

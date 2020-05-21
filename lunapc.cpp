@@ -15,8 +15,10 @@ int main( int argc, char* args[] ) {
 	while(lunadata.gamestate != GAMESTATE_QUIT) {
 		switch(lunadata.gamestate) {
 			case GAMESTATE_RUNNING:
+				GameLoop(&lunadata);
 				break;
 			case GAMESTATE_GAMEOVER:
+				GameOver(&lunadata);
 				break;
 			default:
 				MainMenu(&lunadata);
@@ -29,10 +31,10 @@ int main( int argc, char* args[] ) {
 
 void MainMenu(maindata *lunadata) {
 	SDL_Event e;
-	SDL_Texture *tex;
+/*	SDL_Texture *tex;
 	SDL_Surface *surf;
 	SDL_Color fg = {(Uint8)64, (Uint8)64, (Uint8)255, 255};
-	SDL_Rect destrect = {0, 0, 100, 100};
+	SDL_Rect destrect = {0, 0, 100, 100};*/
 
 	MapInit(lunadata);
 	ClearScreen(lunadata);
@@ -72,7 +74,12 @@ void MainMenu(maindata *lunadata) {
 							lunadata->gamestate = GAMESTATE_QUIT;
 							break;
 							
-						default:break;
+						case SDL_SCANCODE_RCTRL:
+							lunadata->gamestate = GAMESTATE_RUNNING;
+							break;
+							
+						default:
+							break;
 					}
 					break;
 
@@ -80,12 +87,129 @@ void MainMenu(maindata *lunadata) {
 					lunadata->gamestate = GAMESTATE_QUIT;
 					break;
 
-				default:break;
+				default:
+					break;
 			}
 		}
 		
 SDL_Delay(20);
 		GameDrawScreen(lunadata);
+	}
+}
+
+void GameLoop(maindata *lunadata) {
+	SDL_Event e;
+
+	lunadata->IntroActive = 0;
+	MapInit(lunadata);
+	PlayerInit(lunadata);
+	EnemiesInit(lunadata);
+	HudInit(lunadata);
+	GenerateStars(lunadata);
+
+	while(lunadata->gamestate == GAMESTATE_RUNNING) {
+		ClearStars(lunadata);
+		EnemiesDraw(lunadata);
+		BulletsClear(lunadata);
+		BulletsUpdate(lunadata);
+		MapAdvanceMap(lunadata);
+		
+		MapScreenShift(lunadata);
+		BulletsDraw(lunadata);
+		DrawStars(lunadata);
+		EnemiesUpdate(lunadata);
+		
+		PlayerUpdate(lunadata);
+		PlayerDraw(lunadata);
+		
+		if(lunadata->player.PlayerIsDead)
+			lunadata->gamestate = GAMESTATE_GAMEOVER;
+		
+		if((lunadata->player.PowerUpActive) && ((lunadata->ZP_COUNTER & 7) == 0))
+			HudDecPower(lunadata);
+		
+		while(SDL_PollEvent(&e)) {
+
+			switch(e.type) {
+
+				case SDL_KEYDOWN:	
+					switch(e.key.keysym.scancode) {
+
+						case SDL_SCANCODE_ESCAPE:
+							lunadata->gamestate = GAMESTATE_QUIT;
+							break;
+							
+						case SDL_SCANCODE_RCTRL:
+							break;
+							
+						default:
+							break;
+					}
+					break;
+
+				case SDL_QUIT:
+					lunadata->gamestate = GAMESTATE_QUIT;
+					break;
+
+				default:
+					break;
+			}
+		}
+		
+SDL_Delay(20);
+		GameDrawScreen(lunadata);
+		lunadata->ZP_COUNTER++;
+	}
+}
+
+void GameOver(maindata *lunadata) {
+	SDL_Event e;
+
+	lunadata->map.HscrollSpeed = 0;
+	lunadata->DeathAnimIndex = 0;
+	CheckForHighscore(lunadata);
+	
+	while(lunadata->gamestate == GAMESTATE_RUNNING) {
+		BulletsClear(lunadata);
+		BulletsUpdate(lunadata);
+		
+		ClearStars(lunadata);
+		MapAdvanceMap(lunadata);
+		MapScreenShift(lunadata);
+		BulletsDraw(lunadata);
+		DrawStars(lunadata);
+		
+		EnemiesUpdate(lunadata);
+		EnemiesDraw(lunadata);
+		
+		while(SDL_PollEvent(&e)) {
+
+			switch(e.type) {
+
+				case SDL_KEYDOWN:	
+					switch(e.key.keysym.scancode) {
+
+						case SDL_SCANCODE_ESCAPE:
+							lunadata->gamestate = GAMESTATE_QUIT;
+							break;
+							
+						case SDL_SCANCODE_RCTRL:
+							lunadata->gamestate = GAMESTATE_MENU;
+							break;
+							
+						default:
+							break;
+					}
+					break;
+
+				case SDL_QUIT:
+					lunadata->gamestate = GAMESTATE_QUIT;
+					break;
+
+				default:
+					break;
+			}
+		}
 	}
 }
 
@@ -110,6 +234,7 @@ void GameInit(maindata *lunadata) {
 	SDL_FreeSurface(surf);
 
 	lunadata->gamestate = GAMESTATE_MENU;
+	RandomInit(lunadata);
 	for(int i = 0; i < MAX_BULLETS; i++)
 		lunadata->bullets.BulletType[i] = 0;
 }

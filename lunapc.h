@@ -35,13 +35,17 @@ struct maindata {
 	int GameOverFirePressed = 0, GameOverFireCountdown = 0, GameOverMusicTimer = 0;
 	int GameOverSinTicker = 0, GameOverColRamp[8] = {1, 11, 3, 12, 4, 2, 9, 8};
 	int SCREEN[1000], COLORRAM[1000], RandomNum = 0x62;
+	int ZP_COUNTER = 0;
 	uint32_t RandomNumState = 0x62;
 	struct bullets bullets;
 	struct enemies enemies;
 	struct map map;
+	struct player player;
 };
 
 void MainMenu(struct maindata *lunadata);
+void GameLoop(maindata *lunadata);
+void GameOver(maindata *lunadata);
 void GameInit(struct maindata *lunadata);
 void GameClean(struct maindata *lunadata);
 void GameDrawScreen(maindata *lunadata);
