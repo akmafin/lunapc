@@ -49,6 +49,7 @@ void MainMenu(maindata *lunadata) {
 	lunadata->IntroActive = 1;
 	lunadata->map.MinGap = 17;
 	lunadata->map.HscrollSpeed = 2;
+	lunadata->SPRITE_ENA = 0;
 	for(int i = 0; i < 40; i++) {
 		MapGenerateColumn(lunadata);
 		lunadata->map.NeedToShift = 1;
@@ -58,6 +59,9 @@ void MainMenu(maindata *lunadata) {
 	DrawHighscore(lunadata);
 
 	while(lunadata->gamestate == GAMESTATE_MENU) {
+SDL_Delay(20);
+		GameDrawScreen(lunadata);
+		
 		lunadata->GameOverSinTicker++;
 		
 		MapAdvanceMap(lunadata);
@@ -91,15 +95,13 @@ void MainMenu(maindata *lunadata) {
 					break;
 			}
 		}
-		
-SDL_Delay(20);
-		GameDrawScreen(lunadata);
 	}
 }
 
 void GameLoop(maindata *lunadata) {
 	SDL_Event e;
-
+	int pos;
+	
 	lunadata->IntroActive = 0;
 	MapInit(lunadata);
 	PlayerInit(lunadata);
@@ -108,6 +110,9 @@ void GameLoop(maindata *lunadata) {
 	GenerateStars(lunadata);
 
 	while(lunadata->gamestate == GAMESTATE_RUNNING) {
+SDL_Delay(20);
+		GameDrawScreen(lunadata);
+		
 		ClearStars(lunadata);
 		EnemiesDraw(lunadata);
 		BulletsClear(lunadata);
@@ -118,16 +123,7 @@ void GameLoop(maindata *lunadata) {
 		BulletsDraw(lunadata);
 		DrawStars(lunadata);
 		EnemiesUpdate(lunadata);
-		
-		PlayerUpdate(lunadata);
-		PlayerDraw(lunadata);
-		
-		if(lunadata->player.PlayerIsDead)
-			lunadata->gamestate = GAMESTATE_GAMEOVER;
-		
-		if((lunadata->player.PowerUpActive) && ((lunadata->ZP_COUNTER & 7) == 0))
-			HudDecPower(lunadata);
-		
+				
 		while(SDL_PollEvent(&e)) {
 
 			switch(e.type) {
@@ -139,7 +135,47 @@ void GameLoop(maindata *lunadata) {
 							lunadata->gamestate = GAMESTATE_QUIT;
 							break;
 							
+						case SDL_SCANCODE_KP_8:
+							if(lunadata->player.PlayerY[1] >= 0x34) {
+								pos = ((lunadata->player.PlayerY[1] << 8) | (lunadata->player.PlayerY[0])) - ((lunadata->player.PlayerSpeedY[1] << 8) | (lunadata->player.PlayerSpeedY[0]));
+								lunadata->player.PlayerY[0] = pos & 0xFF;
+								lunadata->player.PlayerY[1] = pos >> 8;
+							}
+							break;
+
+						case SDL_SCANCODE_KP_2:
+							if(lunadata->player.PlayerY[1] < 0xDE) {
+								pos = ((lunadata->player.PlayerY[1] << 8) | (lunadata->player.PlayerY[0])) + ((lunadata->player.PlayerSpeedY[1] << 8) | (lunadata->player.PlayerSpeedY[0]));
+								lunadata->player.PlayerY[0] = pos & 0xFF;
+								lunadata->player.PlayerY[1] = pos >> 8;
+							}
+							break;
+
+						case SDL_SCANCODE_KP_4:
+							if((lunadata->player.PlayerX[2]) || ((lunadata->player.PlayerX[2] == 0) && (lunadata->player.PlayerX[1] >= 0x24))) {
+								pos = ((lunadata->player.PlayerX[2] << 16) | (lunadata->player.PlayerX[1] << 8) | (lunadata->player.PlayerX[0])) - ((lunadata->player.PlayerSpeedX[1] << 8) | (lunadata->player.PlayerSpeedX[0]));
+								lunadata->player.PlayerX[0] = pos & 0xFF;
+								lunadata->player.PlayerX[1] = (pos >> 8) & 0xFF;
+								lunadata->player.PlayerX[2] = pos >> 16;
+							}
+							break;
+
+						case SDL_SCANCODE_KP_6:
+							if((lunadata->player.PlayerX[2] == 0) || ((lunadata->player.PlayerX[2]) && (lunadata->player.PlayerX[1] < 0x36))) {
+								pos = ((lunadata->player.PlayerX[2] << 16) | (lunadata->player.PlayerX[1] << 8) | (lunadata->player.PlayerX[0])) + ((lunadata->player.PlayerSpeedX[1] << 8) | (lunadata->player.PlayerSpeedX[0]));
+								lunadata->player.PlayerX[0] = pos & 0xFF;
+								lunadata->player.PlayerX[1] = (pos >> 8) & 0xFF;
+								lunadata->player.PlayerX[2] = pos >> 16;
+							}
+							break;
+
 						case SDL_SCANCODE_RCTRL:
+							if(lunadata->player.PlayerFireTimer[0] == 0) {
+								lunadata->player.PlayerFireTimer[0] = lunadata->player.PlayerFireTimer[1];
+								BulletsAdd(lunadata, lunadata->player.PlayerScreenX + 3, lunadata->player.PlayerScreenY + 1);
+							}
+							else
+								lunadata->player.PlayerFireTimer[0]--;
 							break;
 							
 						default:
@@ -156,8 +192,15 @@ void GameLoop(maindata *lunadata) {
 			}
 		}
 		
-SDL_Delay(20);
-		GameDrawScreen(lunadata);
+		PlayerUpdate(lunadata);
+		PlayerDraw(lunadata);
+		
+		if(lunadata->player.PlayerIsDead)
+			lunadata->gamestate = GAMESTATE_GAMEOVER;
+		
+		if((lunadata->player.PowerUpActive) && ((lunadata->ZP_COUNTER & 7) == 0))
+			HudDecPower(lunadata);
+		
 		lunadata->ZP_COUNTER++;
 	}
 }
@@ -169,7 +212,10 @@ void GameOver(maindata *lunadata) {
 	lunadata->DeathAnimIndex = 0;
 	CheckForHighscore(lunadata);
 	
-	while(lunadata->gamestate == GAMESTATE_RUNNING) {
+	while(lunadata->gamestate == GAMESTATE_GAMEOVER) {
+SDL_Delay(20);
+		GameDrawScreen(lunadata);
+		
 		BulletsClear(lunadata);
 		BulletsUpdate(lunadata);
 		
@@ -251,22 +297,40 @@ void GameClean(maindata *lunadata) {
 }
 
 void GameDrawScreen(maindata *lunadata) {
-	SDL_Rect src = {0, 0, FONTTILE_WIDTH, FONTTILE_HEIGHT}, dest = {0, 0, FONTTILE_WIDTH, FONTTILE_HEIGHT};
-	int ch;
+	SDL_Rect chsrc = {0, 0, FONTTILE_WIDTH, FONTTILE_HEIGHT}, chdest = {0, 0, FONTTILE_WIDTH, FONTTILE_HEIGHT};
+	SDL_Rect spsrc = {0, 0, SPRITETILE_WIDTH, SPRITETILE_HEIGHT}, spdest = {0, 0, SPRITETILE_WIDTH, SPRITETILE_HEIGHT};
+	int ch, sp;
 
-	SDL_SetRenderDrawColor(lunadata->mainrend,0,0,0,0);
+	SDL_SetRenderDrawColor(lunadata->mainrend,0,0,0,SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(lunadata->mainrend);
+	SDL_SetRenderDrawBlendMode(lunadata->mainrend, SDL_BLENDMODE_NONE);
 	
 	for(int y = 0; y < 25; y++) {
 		for( int x = 0; x < 40; x++) {
 			ch = lunadata->SCREEN[y * 40 + x];
-			src.x = (ch % 32) * FONTTILE_WIDTH;
-			src.y = (ch / 32) * FONTTILE_HEIGHT;
-			dest.x = x * FONTTILE_WIDTH + lunadata->map.Hscroll * 2;
-			dest.y = y * FONTTILE_HEIGHT;
-			SDL_RenderCopy(lunadata->mainrend, lunadata->gamefonttex, &src, &dest);
+			chsrc.x = (ch % 32) * FONTTILE_WIDTH;
+			chsrc.y = (ch / 32) * FONTTILE_HEIGHT;
+			chdest.x = x * FONTTILE_WIDTH + lunadata->map.Hscroll * 2;
+			chdest.y = y * FONTTILE_HEIGHT;
+			SDL_RenderCopy(lunadata->mainrend, lunadata->gamefonttex, &chsrc, &chdest);
 		}
 	}
+	
+	SDL_SetRenderDrawBlendMode(lunadata->mainrend, SDL_BLENDMODE_BLEND);
+
+	ch = 128;
+	for(int i = 7; i >= 0; i--) {
+		if(lunadata->SPRITE_ENA & ch) {
+			sp = lunadata->SPRITE_PTRS[i] - 64;
+			spsrc.x = (sp % 8) * SPRITETILE_WIDTH;
+			spsrc.y = (sp / 8) * SPRITETILE_HEIGHT;
+			spdest.x = (lunadata->SPRITE_X[i] - 0x14) * 2;
+			spdest.y = (lunadata->SPRITE_Y[i] - 0x33) * 2;
+			SDL_RenderCopy(lunadata->mainrend, lunadata->gamespritetex, &spsrc, &spdest);
+		}
+		ch = ch >> 1;
+	}
+	
 	SDL_RenderPresent(lunadata->mainrend);
 }
 

@@ -36,6 +36,7 @@ struct maindata {
 	int GameOverSinTicker = 0, GameOverColRamp[8] = {1, 11, 3, 12, 4, 2, 9, 8};
 	int SCREEN[1000], COLORRAM[1000], RandomNum = 0x62;
 	int ZP_COUNTER = 0;
+	int SPRITE_ENA = 0, SPRITE_PTRS[8] = {0}, SPRITE_X[8], SPRITE_Y[8];
 	uint32_t RandomNumState = 0x62;
 	struct bullets bullets;
 	struct enemies enemies;
