@@ -40,6 +40,7 @@ struct maindata {
 	uint32_t RandomNumState = 0x62;
 	struct bullets bullets;
 	struct enemies enemies;
+	struct hud hud;
 	struct map map;
 	struct player player;
 };
@@ -50,6 +51,7 @@ void GameOver(maindata *lunadata);
 void GameInit(struct maindata *lunadata);
 void GameClean(struct maindata *lunadata);
 void GameDrawScreen(maindata *lunadata);
+void GameDelay(maindata *lunadata);
 void ClearScreen(struct maindata *lunadata);
 void ClearColor(struct maindata *lunadata);
 void RandomInit(struct maindata *lunadata);

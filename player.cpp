@@ -1,5 +1,5 @@
 #include "lunapc.h"
-#include <iostream>
+
 void PlayerInit(maindata *lunadata) {
 	lunadata->SPRITE_ENA = 0xFD;
 	lunadata->player.PlayerX[1] = 128;
@@ -20,6 +20,8 @@ void PlayerInit(maindata *lunadata) {
 }
 
 void PlayerUpdate(maindata *lunadata) {
+	int pos;
+
 	lunadata->player.PlayerAnimTimer[0]--;
 	if(lunadata->player.PlayerAnimTimer[0] < 0) {
 		lunadata->player.PlayerAnimTimer[0] = lunadata->player.PlayerAnimTimer[1];
@@ -27,6 +29,50 @@ void PlayerUpdate(maindata *lunadata) {
 		if(lunadata->player.PlayerAnimIndex == 3)
 			lunadata->player.PlayerAnimIndex = 0;
 	}
+
+	if(lunadata->player.Joy & JOY_UP) {
+		if(lunadata->player.PlayerY[1] >= 0x34) {
+			pos = ((lunadata->player.PlayerY[1] << 8) | (lunadata->player.PlayerY[0])) - ((lunadata->player.PlayerSpeedY[1] << 8) | (lunadata->player.PlayerSpeedY[0]));
+			lunadata->player.PlayerY[0] = pos & 0xFF;
+			lunadata->player.PlayerY[1] = pos >> 8;
+		}
+	}
+
+	if(lunadata->player.Joy & JOY_DOWN) {
+		if(lunadata->player.PlayerY[1] < 0xDE) {
+			pos = ((lunadata->player.PlayerY[1] << 8) | (lunadata->player.PlayerY[0])) + ((lunadata->player.PlayerSpeedY[1] << 8) | (lunadata->player.PlayerSpeedY[0]));
+			lunadata->player.PlayerY[0] = pos & 0xFF;
+			lunadata->player.PlayerY[1] = pos >> 8;
+		}
+	}
+
+	if(lunadata->player.Joy & JOY_LEFT) {
+		if((lunadata->player.PlayerX[2]) || ((lunadata->player.PlayerX[2] == 0) && (lunadata->player.PlayerX[1] >= 0x24))) {
+			pos = ((lunadata->player.PlayerX[2] << 16) | (lunadata->player.PlayerX[1] << 8) | (lunadata->player.PlayerX[0])) - ((lunadata->player.PlayerSpeedX[1] << 8) | (lunadata->player.PlayerSpeedX[0]));
+			lunadata->player.PlayerX[0] = pos & 0xFF;
+			lunadata->player.PlayerX[1] = (pos >> 8) & 0xFF;
+			lunadata->player.PlayerX[2] = pos >> 16;
+		}
+	}
+
+	if(lunadata->player.Joy & JOY_RIGHT) {
+		if((lunadata->player.PlayerX[2] == 0) || ((lunadata->player.PlayerX[2]) && (lunadata->player.PlayerX[1] < 0x36))) {
+			pos = ((lunadata->player.PlayerX[2] << 16) | (lunadata->player.PlayerX[1] << 8) | (lunadata->player.PlayerX[0])) + ((lunadata->player.PlayerSpeedX[1] << 8) | (lunadata->player.PlayerSpeedX[0]));
+			lunadata->player.PlayerX[0] = pos & 0xFF;
+			lunadata->player.PlayerX[1] = (pos >> 8) & 0xFF;
+			lunadata->player.PlayerX[2] = pos >> 16;
+		}
+	}
+
+	if(lunadata->player.Joy & JOY_FIRE) {
+		if(lunadata->player.PlayerFireTimer[0] == 0) {
+			lunadata->player.PlayerFireTimer[0] = lunadata->player.PlayerFireTimer[1];
+			BulletsAdd(lunadata, lunadata->player.PlayerScreenX + 3, lunadata->player.PlayerScreenY + 1);
+		}
+		else
+			lunadata->player.PlayerFireTimer[0]--;
+	}
+
 	PlayerGetCollision(lunadata);
 }
 

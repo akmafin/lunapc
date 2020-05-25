@@ -1,9 +1,10 @@
 /*
- * LunAPC V0.01 2020-05-13
+ * LunAPC V0.02 2020-05-24
  * by AkmaFin
  */
 
 #include <iostream>
+#include <chrono>
 #include "lunapc.h"
 
 int main( int argc, char* args[] ) {
@@ -59,7 +60,7 @@ void MainMenu(maindata *lunadata) {
 	DrawHighscore(lunadata);
 
 	while(lunadata->gamestate == GAMESTATE_MENU) {
-SDL_Delay(20);
+		GameDelay(lunadata);
 		GameDrawScreen(lunadata);
 		
 		lunadata->GameOverSinTicker++;
@@ -100,8 +101,8 @@ SDL_Delay(20);
 
 void GameLoop(maindata *lunadata) {
 	SDL_Event e;
-	int pos;
-	
+	const Uint8 *keystate;
+
 	lunadata->IntroActive = 0;
 	MapInit(lunadata);
 	PlayerInit(lunadata);
@@ -110,7 +111,7 @@ void GameLoop(maindata *lunadata) {
 	GenerateStars(lunadata);
 
 	while(lunadata->gamestate == GAMESTATE_RUNNING) {
-SDL_Delay(20);
+		GameDelay(lunadata);
 		GameDrawScreen(lunadata);
 		
 		ClearStars(lunadata);
@@ -123,7 +124,8 @@ SDL_Delay(20);
 		BulletsDraw(lunadata);
 		DrawStars(lunadata);
 		EnemiesUpdate(lunadata);
-				
+		lunadata->player.Joy = 0;
+
 		while(SDL_PollEvent(&e)) {
 
 			switch(e.type) {
@@ -133,49 +135,6 @@ SDL_Delay(20);
 
 						case SDL_SCANCODE_ESCAPE:
 							lunadata->gamestate = GAMESTATE_QUIT;
-							break;
-							
-						case SDL_SCANCODE_KP_8:
-							if(lunadata->player.PlayerY[1] >= 0x34) {
-								pos = ((lunadata->player.PlayerY[1] << 8) | (lunadata->player.PlayerY[0])) - ((lunadata->player.PlayerSpeedY[1] << 8) | (lunadata->player.PlayerSpeedY[0]));
-								lunadata->player.PlayerY[0] = pos & 0xFF;
-								lunadata->player.PlayerY[1] = pos >> 8;
-							}
-							break;
-
-						case SDL_SCANCODE_KP_2:
-							if(lunadata->player.PlayerY[1] < 0xDE) {
-								pos = ((lunadata->player.PlayerY[1] << 8) | (lunadata->player.PlayerY[0])) + ((lunadata->player.PlayerSpeedY[1] << 8) | (lunadata->player.PlayerSpeedY[0]));
-								lunadata->player.PlayerY[0] = pos & 0xFF;
-								lunadata->player.PlayerY[1] = pos >> 8;
-							}
-							break;
-
-						case SDL_SCANCODE_KP_4:
-							if((lunadata->player.PlayerX[2]) || ((lunadata->player.PlayerX[2] == 0) && (lunadata->player.PlayerX[1] >= 0x24))) {
-								pos = ((lunadata->player.PlayerX[2] << 16) | (lunadata->player.PlayerX[1] << 8) | (lunadata->player.PlayerX[0])) - ((lunadata->player.PlayerSpeedX[1] << 8) | (lunadata->player.PlayerSpeedX[0]));
-								lunadata->player.PlayerX[0] = pos & 0xFF;
-								lunadata->player.PlayerX[1] = (pos >> 8) & 0xFF;
-								lunadata->player.PlayerX[2] = pos >> 16;
-							}
-							break;
-
-						case SDL_SCANCODE_KP_6:
-							if((lunadata->player.PlayerX[2] == 0) || ((lunadata->player.PlayerX[2]) && (lunadata->player.PlayerX[1] < 0x36))) {
-								pos = ((lunadata->player.PlayerX[2] << 16) | (lunadata->player.PlayerX[1] << 8) | (lunadata->player.PlayerX[0])) + ((lunadata->player.PlayerSpeedX[1] << 8) | (lunadata->player.PlayerSpeedX[0]));
-								lunadata->player.PlayerX[0] = pos & 0xFF;
-								lunadata->player.PlayerX[1] = (pos >> 8) & 0xFF;
-								lunadata->player.PlayerX[2] = pos >> 16;
-							}
-							break;
-
-						case SDL_SCANCODE_RCTRL:
-							if(lunadata->player.PlayerFireTimer[0] == 0) {
-								lunadata->player.PlayerFireTimer[0] = lunadata->player.PlayerFireTimer[1];
-								BulletsAdd(lunadata, lunadata->player.PlayerScreenX + 3, lunadata->player.PlayerScreenY + 1);
-							}
-							else
-								lunadata->player.PlayerFireTimer[0]--;
 							break;
 							
 						default:
@@ -191,7 +150,20 @@ SDL_Delay(20);
 					break;
 			}
 		}
+
+		keystate=SDL_GetKeyboardState(NULL);
 		
+		if(keystate[SDL_SCANCODE_KP_8])
+			lunadata->player.Joy |= JOY_UP;
+		if(keystate[SDL_SCANCODE_KP_2])
+			lunadata->player.Joy |= JOY_DOWN;
+		if(keystate[SDL_SCANCODE_KP_4])
+			lunadata->player.Joy |= JOY_LEFT;
+		if(keystate[SDL_SCANCODE_KP_6])
+			lunadata->player.Joy |= JOY_RIGHT;
+		if(keystate[SDL_SCANCODE_RCTRL])
+			lunadata->player.Joy |= JOY_FIRE;
+	
 		PlayerUpdate(lunadata);
 		PlayerDraw(lunadata);
 		
@@ -213,7 +185,7 @@ void GameOver(maindata *lunadata) {
 	CheckForHighscore(lunadata);
 	
 	while(lunadata->gamestate == GAMESTATE_GAMEOVER) {
-SDL_Delay(20);
+		GameDelay(lunadata);
 		GameDrawScreen(lunadata);
 		
 		BulletsClear(lunadata);
@@ -261,7 +233,7 @@ SDL_Delay(20);
 
 void GameInit(maindata *lunadata) {
 	SDL_Surface *surf;
-	SDL_Rect rect = {16, 0, 624, 400};
+	SDL_Rect rect = {16, 0, 608, 400};
 
 	SDL_Init(SDL_INIT_VIDEO);
 	lunadata->mainwin = SDL_CreateWindow("LunAPC", 0, 0, 656, 400, SDL_WINDOW_SHOWN);
@@ -310,7 +282,10 @@ void GameDrawScreen(maindata *lunadata) {
 			ch = lunadata->SCREEN[y * 40 + x];
 			chsrc.x = (ch % 32) * FONTTILE_WIDTH;
 			chsrc.y = (ch / 32) * FONTTILE_HEIGHT;
-			chdest.x = x * FONTTILE_WIDTH + lunadata->map.Hscroll * 2;
+			if(y != 24)
+				chdest.x = x * FONTTILE_WIDTH + lunadata->map.Hscroll * 2;
+			else
+				chdest.x = x * FONTTILE_WIDTH;
 			chdest.y = y * FONTTILE_HEIGHT;
 			SDL_RenderCopy(lunadata->mainrend, lunadata->gamefonttex, &chsrc, &chdest);
 		}
@@ -324,7 +299,7 @@ void GameDrawScreen(maindata *lunadata) {
 			sp = lunadata->SPRITE_PTRS[i] - 64;
 			spsrc.x = (sp % 8) * SPRITETILE_WIDTH;
 			spsrc.y = (sp / 8) * SPRITETILE_HEIGHT;
-			spdest.x = (lunadata->SPRITE_X[i] - 0x14) * 2;
+			spdest.x = (lunadata->SPRITE_X[i] - 0x18) * 2;
 			spdest.y = (lunadata->SPRITE_Y[i] - 0x33) * 2;
 			SDL_RenderCopy(lunadata->mainrend, lunadata->gamespritetex, &spsrc, &spdest);
 		}
@@ -332,6 +307,22 @@ void GameDrawScreen(maindata *lunadata) {
 	}
 	
 	SDL_RenderPresent(lunadata->mainrend);
+}
+
+void GameDelay(maindata *lunadata) {
+	static std::chrono::high_resolution_clock::time_point last_time;
+	std::chrono::high_resolution_clock::time_point time;
+	std::chrono::duration<double, std::milli> time_span;
+
+	do {
+		time = std::chrono::high_resolution_clock::now();
+		time_span = time - last_time;
+		if(time_span.count() < 18.0)
+			SDL_Delay(1);
+	} while(time_span.count() < 20.0);
+
+	time = std::chrono::high_resolution_clock::now();
+	last_time = time;
 }
 
 void ClearScreen(maindata *lunadata) {
