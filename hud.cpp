@@ -6,16 +6,21 @@ void HudInit(struct maindata *lunadata) {
 	}
 }
 
-void HudAddScore(struct maindata *lunadata) {
+void HudAddScore(struct maindata *lunadata, int value) {
+	char buf[8];
+
+	lunadata->hud.Score += value;
+	snprintf(buf, 8, "%07d", lunadata->hud.Score);
+	for(int i = 0; i < 7; i++)
+		lunadata->SCREEN[24 * 40 + 7 + i] = buf[i];
 }
 
 void HudDisplayWaveNumber(struct maindata *lunadata) {
 	char buf[4];
 	
 	snprintf(buf, 4, "%03d", lunadata->enemies.CurrentWaveNumber);
-	lunadata->SCREEN[24 * 40 + 36] = buf[0];
-	lunadata->SCREEN[24 * 40 + 37] = buf[1];
-	lunadata->SCREEN[24 * 40 + 38] = buf[2];
+	for(int i = 0; i < 3; i++)
+		lunadata->SCREEN[24 * 40 + 36 + i] = buf[i];
 }
 
 void HudDecPower(struct maindata *lunadata) {

@@ -2,6 +2,8 @@
 #define enemies_h
 
 #define MAX_ENEMIES					6
+#define ENEMY_INIT					0
+#define ENEMY_UPDATE				3
 
 struct enemies {
 	int EnemyX0[MAX_ENEMIES] = {0}, EnemyX1[MAX_ENEMIES] = {0}, EnemyX2[MAX_ENEMIES] = {0};
@@ -14,14 +16,14 @@ struct enemies {
 	int DeathFrames[5] = {68, 69, 70, 71, 67};
 	int EnemyStartFrames[6] = {72, 88, 96, 112, 120, 128};
 	int EnemyFrameCount[6] = {10, 6, 4, 4, 4, 4};
-	int SectorTransition = 0;
+	int SectorTransition = 0, SinTicker[8] = {0};
 };
 
 void EnemiesInit(struct maindata *lunadata);
 void EnemiesAddWave(struct maindata *lunadata);
 void EnemiesUpdate(struct maindata *lunadata);
 void EnemiesDraw(struct maindata *lunadata);
-void EnemiesCheckVsBullets(struct maindata *lunadata);
-void EnemiesDoWaveAction(struct maindata *lunadata);
+void EnemiesCheckVsBullets(struct maindata *lunadata, int num);
+void EnemiesDoWaveAction(struct maindata *lunadata, int type, int action);
 
 #endif

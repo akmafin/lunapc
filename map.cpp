@@ -15,6 +15,7 @@ void MapInit(maindata *lunadata) {
 	lunadata->map.FloorDir = 0;
 	lunadata->map.CeilDir = 0;
 	lunadata->map.MinHeight = 2;
+	lunadata->hud.Score = 0;
 }
 
 void MapGenerateColumn(maindata *lunadata) {

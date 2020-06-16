@@ -113,7 +113,7 @@ void GameLoop(maindata *lunadata) {
 	while(lunadata->gamestate == GAMESTATE_RUNNING) {
 		GameDelay(lunadata);
 		GameDrawScreen(lunadata);
-		
+
 		ClearStars(lunadata);
 		EnemiesDraw(lunadata);
 		BulletsClear(lunadata);
