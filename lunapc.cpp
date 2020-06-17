@@ -300,7 +300,7 @@ void GameDrawScreen(maindata *lunadata) {
 			spsrc.x = (sp % 8) * SPRITETILE_WIDTH;
 			spsrc.y = (sp / 8) * SPRITETILE_HEIGHT;
 			spdest.x = (lunadata->SPRITE_X[i] - 0x18) * 2;
-			spdest.y = (lunadata->SPRITE_Y[i] - 0x33) * 2;
+			spdest.y = (lunadata->SPRITE_Y[i] - 0x32) * 2;
 			SDL_RenderCopy(lunadata->mainrend, lunadata->gamespritetex, &spsrc, &spdest);
 		}
 		ch = ch >> 1;

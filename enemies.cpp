@@ -112,7 +112,7 @@ void EnemiesDraw(struct maindata *lunadata) {
 			else
 				lunadata->SPRITE_PTRS[i + 2] = lunadata->enemies.EnemyDeathFrame[i];
 			
-			lunadata->SPRITE_X[i + 2] = lunadata->enemies.EnemyX1[i] + (lunadata->enemies.EnemyX2[i] << 8);
+			lunadata->SPRITE_X[i + 2] = lunadata->enemies.EnemyX1[i] | (lunadata->enemies.EnemyX2[i] << 8);
 			lunadata->SPRITE_Y[i + 2] = lunadata->enemies.EnemyY1[i];
 			
 			EnemiesCheckVsBullets(lunadata, i);
@@ -124,6 +124,31 @@ void EnemiesDraw(struct maindata *lunadata) {
 }
 
 void EnemiesCheckVsBullets(struct maindata *lunadata, int num) {
+	int x, y, enemyscry, enemyscrx;
+
+	if(lunadata->enemies.EnemyDying[num] == 0) {
+		enemyscry = (lunadata->enemies.EnemyY1[num] - 0x32) / 8;
+		enemyscrx = ((lunadata->enemies.EnemyX1[num] | (lunadata->enemies.EnemyX2[num] << 8)) - 0x18) / 8;
+		for(int i = 0; i < MAX_BULLETS; i++) {
+			if(lunadata->bullets.BulletType[i] != 0) {
+				y = lunadata->bullets.BulletY[i] - enemyscry;
+				if((y >= 0) && (y < 3)) {
+					x = lunadata->bullets.BulletX[i] - enemyscrx;
+					if((x >= 0) && (x < 3)) {
+						lunadata->bullets.BulletType[i] = -1;
+						lunadata->enemies.EnemyDying[num] = 1;
+						lunadata->enemies.EnemyDeathIndex[num] = 0;
+						HudAddScore(lunadata, lunadata->enemies.CurrentWaveNumber / 4 + 1);
+						HudAddPower(lunadata);
+						lunadata->enemies.CurrentEnemyKillCount++;
+						if(lunadata->enemies.CurrentEnemyKillCount == MAX_ENEMIES) {
+							HudAddScore(lunadata, (lunadata->enemies.CurrentWaveNumber / 4 + 1) * 10);
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void EnemiesDoWaveAction(struct maindata *lunadata, int type, int action) {
@@ -137,7 +162,7 @@ void EnemiesDoWaveAction(struct maindata *lunadata, int type, int action) {
 			lunadata->enemies.EnemyX2[i] = 1;
 		}
 	} else {
-std::cout << type << std::endl;
+//std::cout << type << std::endl;
 		lunadata->enemies.SinTicker[type] = (lunadata->enemies.SinTicker[type] + 1) & 0xFF;
 		for(int i = 0; i < MAX_ENEMIES; i++) {
 			if(lunadata->enemies.EnemyDying[i] == 0) {
