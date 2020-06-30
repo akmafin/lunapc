@@ -68,6 +68,7 @@ void PlayerUpdate(maindata *lunadata) {
 		if(lunadata->player.PlayerFireTimer[0] == 0) {
 			lunadata->player.PlayerFireTimer[0] = lunadata->player.PlayerFireTimer[1];
 			BulletsAdd(lunadata, lunadata->player.PlayerScreenX + 3, lunadata->player.PlayerScreenY + 1);
+			SoundSfxShoot(lunadata);
 		}
 		else
 			lunadata->player.PlayerFireTimer[0]--;
@@ -105,6 +106,7 @@ void PlayerGetCollision(maindata *lunadata) {
 
 	if(ch > 0) {
 		lunadata->player.PlayerIsDead = 1;
+		SoundSfxExplode(lunadata);
 	} else {
 		// sprite collision
 	}

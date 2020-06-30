@@ -37,6 +37,7 @@ void MainMenu(maindata *lunadata) {
 	SDL_Color fg = {(Uint8)64, (Uint8)64, (Uint8)255, 255};
 	SDL_Rect destrect = {0, 0, 100, 100};*/
 
+	Mix_PlayMusic(lunadata->sound.musicgame, -1);
 	MapInit(lunadata);
 	ClearScreen(lunadata);
 	
@@ -109,6 +110,7 @@ void GameLoop(maindata *lunadata) {
 	EnemiesInit(lunadata);
 	HudInit(lunadata);
 	GenerateStars(lunadata);
+	Mix_PlayMusic(lunadata->sound.musicgame, -1);
 
 	while(lunadata->gamestate == GAMESTATE_RUNNING) {
 		GameDelay(lunadata);
@@ -180,6 +182,7 @@ void GameLoop(maindata *lunadata) {
 void GameOver(maindata *lunadata) {
 	SDL_Event e;
 
+	Mix_PlayMusic(lunadata->sound.musicgameover, 0);
 	lunadata->map.HscrollSpeed = 0;
 	lunadata->DeathAnimIndex = 0;
 	CheckForHighscore(lunadata);
@@ -250,14 +253,26 @@ void GameInit(maindata *lunadata) {
 	surf = IMG_Load("assets/sprites.png");
 	lunadata->gamespritetex = SDL_CreateTextureFromSurface(lunadata->mainrend, surf);
 	SDL_FreeSurface(surf);
-
+	
 	lunadata->gamestate = GAMESTATE_MENU;
 	RandomInit(lunadata);
 	for(int i = 0; i < MAX_BULLETS; i++)
 		lunadata->bullets.BulletType[i] = 0;
+	SoundInit(lunadata);
 }
 
 void GameClean(maindata *lunadata) {
+	Mix_HaltMusic();
+	if(lunadata->sound.musicgame)
+		Mix_FreeMusic(lunadata->sound.musicgame);
+	if(lunadata->sound.musicgameover)
+		Mix_FreeMusic(lunadata->sound.musicgameover);
+	
+	for (int i = 0; i < NUM_SOUNDS; i++)
+		Mix_FreeChunk(lunadata->sound.mixchunk[i]);
+
+	Mix_CloseAudio();
+
 	SDL_DestroyTexture(lunadata->gamefonttex);
 	SDL_DestroyTexture(lunadata->gamespritetex);
 	IMG_Quit();

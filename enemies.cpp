@@ -46,7 +46,10 @@ void EnemiesAddWave(struct maindata *lunadata) {
 		lunadata->enemies.CurrentEnemyType = lunadata->RandomNum & 7;
 		
 		RandomGet(lunadata);
-		lunadata->enemies.CurrentWaveType = (lunadata->RandomNum & 7) + 1;
+//		lunadata->enemies.CurrentWaveType = (lunadata->RandomNum & 7) + 1;
+lunadata->enemies.CurrentWaveType += 1;
+if(lunadata->enemies.CurrentWaveType > 8)
+	lunadata->enemies.CurrentWaveType = 1;
 		EnemiesDoWaveAction(lunadata, lunadata->enemies.CurrentWaveType, ENEMY_INIT);
 		
 		for(int i = 0; i < MAX_ENEMIES; i++) {
@@ -138,10 +141,12 @@ void EnemiesCheckVsBullets(struct maindata *lunadata, int num) {
 						lunadata->bullets.BulletType[i] = -1;
 						lunadata->enemies.EnemyDying[num] = 1;
 						lunadata->enemies.EnemyDeathIndex[num] = 0;
+						SoundSfxExplode(lunadata);
 						HudAddScore(lunadata, lunadata->enemies.CurrentWaveNumber / 4 + 1);
 						HudAddPower(lunadata);
 						lunadata->enemies.CurrentEnemyKillCount++;
 						if(lunadata->enemies.CurrentEnemyKillCount == MAX_ENEMIES) {
+							SoundSfxBonus(lunadata);
 							HudAddScore(lunadata, (lunadata->enemies.CurrentWaveNumber / 4 + 1) * 10);
 						}
 					}
@@ -156,13 +161,33 @@ void EnemiesDoWaveAction(struct maindata *lunadata, int type, int action) {
 
 	type--;
 	if(action == ENEMY_INIT) {
-		for(int i = 0; i < MAX_ENEMIES; i++) {
-			lunadata->enemies.EnemyX1[i] = 0x60 + i * 0x10;
-			lunadata->enemies.EnemyY1[i] = 0x38 + i * 0x18;
-			lunadata->enemies.EnemyX2[i] = 1;
+std::cout << "WAVE TYPE:" << type << std::endl;
+		switch(type) {
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			default:
+				for(int i = 0; i < MAX_ENEMIES; i++) {
+					lunadata->enemies.EnemyX1[i] = 0x60 + i * 0x10;
+					lunadata->enemies.EnemyY1[i] = 0x38 + i * 0x18;
+					lunadata->enemies.EnemyX2[i] = 1;
+				}
+				break;
+			case 5:
+			case 6:
+			case 7:
+				for(int i = 0; i < MAX_ENEMIES; i++) {
+					RandomGet(lunadata);
+					lunadata->enemies.EnemyX1[i] = 0x50 + (lunadata->RandomNum & 0x7F);
+					RandomGet(lunadata);
+					lunadata->enemies.EnemyY1[i] = 0x40 + (lunadata->RandomNum & 0x7F);
+					lunadata->enemies.EnemyX2[i] = 1;
+				}
+				break;
 		}
 	} else {
-//std::cout << type << std::endl;
 		lunadata->enemies.SinTicker[type] = (lunadata->enemies.SinTicker[type] + 1) & 0xFF;
 		for(int i = 0; i < MAX_ENEMIES; i++) {
 			if(lunadata->enemies.EnemyDying[i] == 0) {

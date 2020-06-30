@@ -43,6 +43,7 @@ struct maindata {
 	struct hud hud;
 	struct map map;
 	struct player player;
+	struct sound sound;
 };
 
 void MainMenu(struct maindata *lunadata);
