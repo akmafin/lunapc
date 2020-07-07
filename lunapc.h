@@ -44,6 +44,7 @@ struct maindata {
 	struct map map;
 	struct player player;
 	struct sound sound;
+int debugmode = 0;
 };
 
 void MainMenu(struct maindata *lunadata);

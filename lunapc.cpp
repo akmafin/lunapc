@@ -165,6 +165,10 @@ void GameLoop(maindata *lunadata) {
 			lunadata->player.Joy |= JOY_RIGHT;
 		if(keystate[SDL_SCANCODE_RCTRL])
 			lunadata->player.Joy |= JOY_FIRE;
+if(keystate[SDL_SCANCODE_Q])
+	lunadata->debugmode = 1;
+if(keystate[SDL_SCANCODE_W])
+	lunadata->debugmode = 0;
 	
 		PlayerUpdate(lunadata);
 		PlayerDraw(lunadata);

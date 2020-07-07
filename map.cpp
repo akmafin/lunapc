@@ -1,6 +1,7 @@
 #include "lunapc.h"
-
+#include <iostream>
 void MapInit(maindata *lunadata) {
+RandomInit(lunadata);
 	lunadata->map.MapCols = -1;
 	MapChangeMapColors(lunadata);
 	ClearScreen(lunadata);
@@ -127,23 +128,22 @@ void MapGenerateColumn(maindata *lunadata) {
 
 	// Apply floor
 	mod = 24 - lunadata->map.FloorHeight;
-	if(lunadata->map.FloorDir < 0)
+	if(lunadata->map.FloorDir == -1)
 		mod--;
-	
 	// Reset char
 	ch = 135;
 
 	// Draw Floor
 	x = lunadata->map.FloorHeight;
-	if(lunadata->map.FloorDir < 0) {
+	if(lunadata->map.FloorDir == -1) {
 		x++;
 	}
 	do {
 		if(x == 1) {
-			if(lunadata->map.FloorDir > 0) {
+			if(lunadata->map.FloorDir == 1) {
 				ch = lunadata->map.GrassTop[2];
 			} else {
-				if(lunadata->map.FloorDir < 0) {
+				if(lunadata->map.FloorDir == -1) {
 					ch = lunadata->map.GrassTop[0];
 				} else {
 					ch = 129;
@@ -151,10 +151,11 @@ void MapGenerateColumn(maindata *lunadata) {
 			}
 		}
 		x--;
-		if(x >= 0)
+		if(x >= 0) {
 			lunadata->map.ColData[mod + x] = ch;
+		}
 	} while(x >= 0);
-	
+
 	// Decorate floor
 	x = 0;
 	if(lunadata->map.DecorateType != 3) {
@@ -179,7 +180,7 @@ void MapGenerateColumn(maindata *lunadata) {
 			lunadata->map.ColData[lunadata->map.CeilHeight - 1] = lunadata->map.CeilTop[0];
 	}
 	lunadata->map.PrevCeilHeight = lunadata->map.CeilHeight;
-	
+
 	// Add random holes and fix the floor slopes
 	for(int i = 0; i < 24; i++) {
 		if((lunadata->map.ColData[i] == 128) || (lunadata->map.ColData[i] == 130))
