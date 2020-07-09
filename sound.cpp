@@ -18,7 +18,7 @@ void SoundInit(maindata *lunadata) {
 			lunadata->sound.mixchunk[SOUND_EXPLODE] = Mix_LoadWAV("assets/hallow-explode.wav");
 			lunadata->sound.mixchunk[SOUND_BONUS] = Mix_LoadWAV("assets/hallow-bonus.wav");
 			
-			lunadata->sound.musicgame = Mix_LoadMUS("assets/hallow-music.wav");
+			lunadata->sound.musicgame = Mix_LoadMUS("assets/hallow-music.ogg");
 			lunadata->sound.musicgameover = Mix_LoadMUS("assets/hallow-gameover.wav");
 			//std::cout << "MUS" << music << Mix_GetError() << std::flush;
 			Mix_VolumeMusic(MIX_MAX_VOLUME * 0.9);

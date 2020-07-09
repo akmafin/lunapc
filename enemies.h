@@ -17,6 +17,7 @@ struct enemies {
 	int EnemyStartFrames[6] = {72, 88, 96, 112, 120, 128};
 	int EnemyFrameCount[6] = {10, 6, 4, 4, 4, 4};
 	int SectorTransition = 0, SinTicker[8] = {0};
+	int SinX[8][256] = {{0}}, SinY[8][256] = {{0}};
 };
 
 void EnemiesInit(struct maindata *lunadata);

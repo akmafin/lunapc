@@ -157,7 +157,7 @@ void EnemiesCheckVsBullets(struct maindata *lunadata, int num) {
 }
 
 void EnemiesDoWaveAction(struct maindata *lunadata, int type, int action) {
-	int j;
+	int j, pos;
 
 	type--;
 	if(action == ENEMY_INIT) {
@@ -188,12 +188,75 @@ std::cout << "WAVE TYPE:" << type << std::endl;
 				break;
 		}
 	} else {
-		lunadata->enemies.SinTicker[type] = (lunadata->enemies.SinTicker[type] + 1) & 0xFF;
-		for(int i = 0; i < MAX_ENEMIES; i++) {
-			if(lunadata->enemies.EnemyDying[i] == 0) {
-				j = (i * 16 + lunadata->enemies.SinTicker[type]) & 0xFF;
-				lunadata->enemies.EnemyY1[i] = sin(M_PI * 2 * j / 256) * 80 + 88 + 50;
-			}
+		switch(type) {
+			default:
+			case 0:
+				lunadata->enemies.SinTicker[type] = (lunadata->enemies.SinTicker[type] + 1) & 0xFF;
+				for(int i = 0; i < MAX_ENEMIES; i++) {
+					if(lunadata->enemies.EnemyDying[i] == 0) {
+						j = (i * 16 + lunadata->enemies.SinTicker[type]) & 0xFF;
+						lunadata->enemies.EnemyY1[i] = lunadata->enemies.SinY[type][j];
+					}
+				}
+				break;
+			case 1:
+				lunadata->enemies.SinTicker[type] = (lunadata->enemies.SinTicker[type] + 1) & 0xFF;
+				for(int i = 0; i < MAX_ENEMIES; i++) {
+					if(lunadata->enemies.EnemyDying[i] == 0) {
+						j = (i * 64 + lunadata->enemies.SinTicker[type]) & 0xFF;
+						lunadata->enemies.EnemyY1[i] = lunadata->enemies.SinY[type][j];
+					}
+				}
+				break;
+			case 2:
+				lunadata->enemies.SinTicker[type] = (lunadata->enemies.SinTicker[type] + 1) & 0xFF;
+				for(int i = 0; i < MAX_ENEMIES; i++) {
+					if(lunadata->enemies.EnemyDying[i] == 0) {
+						j = (i * 16 + lunadata->enemies.SinTicker[type]) & 0xFF;
+						lunadata->enemies.EnemyY1[i] = lunadata->enemies.SinY[type][j];
+						pos = ((lunadata->enemies.EnemyX2[i] << 8) | (lunadata->enemies.EnemyX1[i])) + lunadata->enemies.SinX[type][j];
+						lunadata->enemies.EnemyX1[i] = pos & 0xFF;
+						lunadata->enemies.EnemyX2[i] = pos >> 8;
+					}
+				}
+				break;
+			case 3:
+			case 4:
+			case 7:
+				lunadata->enemies.SinTicker[type] = (lunadata->enemies.SinTicker[type] + 1) & 0xFF;
+				for(int i = 0; i < MAX_ENEMIES; i++) {
+					if(lunadata->enemies.EnemyDying[i] == 0) {
+						j = (i * 8 + lunadata->enemies.SinTicker[type]) & 0xFF;
+						lunadata->enemies.EnemyY1[i] = lunadata->enemies.SinY[type][j];
+						pos = ((lunadata->enemies.EnemyX2[i] << 8) | (lunadata->enemies.EnemyX1[i])) + lunadata->enemies.SinX[type][j];
+						lunadata->enemies.EnemyX1[i] = pos & 0xFF;
+						lunadata->enemies.EnemyX2[i] = pos >> 8;
+					}
+				}
+				break;
+			case 5:
+				lunadata->enemies.SinTicker[type] = (lunadata->enemies.SinTicker[type] + 1) & 0xFF;
+				for(int i = 0; i < MAX_ENEMIES; i++) {
+					if(lunadata->enemies.EnemyDying[i] == 0) {
+						j = (i * 16 + lunadata->enemies.SinTicker[type]) & 0xFF;
+						pos = ((lunadata->enemies.EnemyX2[i] << 8) | (lunadata->enemies.EnemyX1[i])) + lunadata->enemies.SinX[type][j];
+						lunadata->enemies.EnemyX1[i] = pos & 0xFF;
+						lunadata->enemies.EnemyX2[i] = pos >> 8;
+					}
+				}
+				break;
+			case 6:
+				lunadata->enemies.SinTicker[type] = (lunadata->enemies.SinTicker[type] + 1) & 0xFF;
+				for(int i = 0; i < MAX_ENEMIES; i++) {
+					if(lunadata->enemies.EnemyDying[i] == 0) {
+						j = (i * 16 + lunadata->enemies.SinTicker[type]) & 0xFF;
+						lunadata->enemies.EnemyY1[i] = lunadata->enemies.SinY[type][j];
+						pos = ((lunadata->enemies.EnemyX2[i] << 8) | (lunadata->enemies.EnemyX1[i])) - 2;
+						lunadata->enemies.EnemyX1[i] = pos & 0xFF;
+						lunadata->enemies.EnemyX2[i] = pos >> 8;
+					}
+				}
+				break;
 		}
 	}
 }

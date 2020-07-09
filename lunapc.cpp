@@ -5,12 +5,13 @@
 
 #include <iostream>
 #include <chrono>
+#include <cmath>
 #include "lunapc.h"
 
 int main( int argc, char* args[] ) {
 	maindata lunadata;
 	
-	std::cout << "LunAPC\r\n";
+	std::cout << "LunAPC V0.50\r\n";
 	GameInit(&lunadata);
 
 	while(lunadata.gamestate != GAMESTATE_QUIT) {
@@ -247,8 +248,8 @@ void GameInit(maindata *lunadata) {
 	lunadata->mainrend = SDL_CreateRenderer(lunadata->mainwin, -1, SDL_RENDERER_ACCELERATED);
 	SDL_RenderSetClipRect(lunadata->mainrend, &rect);
 
-	TTF_Init();
-	lunadata->font=TTF_OpenFont("assets/Aileron-SemiBold.ttf", 32);
+//	TTF_Init();
+//	lunadata->font=TTF_OpenFont("assets/Aileron-SemiBold.ttf", 32);
 	
 	IMG_Init(IMG_INIT_PNG);
 	surf = IMG_Load("assets/font.png");
@@ -263,6 +264,21 @@ void GameInit(maindata *lunadata) {
 	for(int i = 0; i < MAX_BULLETS; i++)
 		lunadata->bullets.BulletType[i] = 0;
 	SoundInit(lunadata);
+	
+	for(int i = 0; i < 256; i++) {
+		lunadata->enemies.SinY[0][i] = sin((i / 256.0) * (M_PI * 2)) * 80 + 88 + 50;
+		lunadata->enemies.SinY[1][i] = lunadata->enemies.SinY[0][i];
+		lunadata->enemies.SinY[2][i] = lunadata->enemies.SinY[0][i];
+		lunadata->enemies.SinX[2][i] = (cos(((i - 1) / 128.0) * (M_PI * 2)) * 64 + 32) - (cos(( i / 128.0) * (M_PI * 2)) * 64 + 32);
+		lunadata->enemies.SinY[3][i] = sin((i / 128.0) * (M_PI * 2)) * 80 + 88 + 50;
+		lunadata->enemies.SinX[3][i] = (cos(((i - 1) / 64.0) * (M_PI * 2)) * 64 + 64) - (cos((i / 64.0) * (M_PI * 2)) * 64 + 64);
+		lunadata->enemies.SinY[4][i] = sin((i / 128.0) * (M_PI * 2) * 0.5) * 80 + 88 + 50;
+		lunadata->enemies.SinX[4][i] = ((cos(((i - 1) / 64.0) * (M_PI * 2)) * 64 + 64) - (cos((i / 64.0) * (M_PI * 2)) * 64 + 64)) / 2;
+		lunadata->enemies.SinX[5][i] = ((cos(((i - 1) / 128.0) * (M_PI * 2)) * 96 + 32) - (cos((i / 128.0) * (M_PI * 2)) * 96 + 32));
+		lunadata->enemies.SinY[6][i] = lunadata->enemies.SinY[0][i];
+		lunadata->enemies.SinY[7][i] = lunadata->enemies.SinY[3][i];
+		lunadata->enemies.SinX[7][i] = lunadata->enemies.SinX[3][i];
+	}
 }
 
 void GameClean(maindata *lunadata) {
@@ -280,8 +296,8 @@ void GameClean(maindata *lunadata) {
 	SDL_DestroyTexture(lunadata->gamefonttex);
 	SDL_DestroyTexture(lunadata->gamespritetex);
 	IMG_Quit();
-	TTF_CloseFont(lunadata->font);
-	TTF_Quit();
+//	TTF_CloseFont(lunadata->font);
+//	TTF_Quit();
 	SDL_DestroyRenderer(lunadata->mainrend);
 	SDL_DestroyWindow(lunadata->mainwin);
 	SDL_Quit();
