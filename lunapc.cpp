@@ -11,7 +11,7 @@
 int main( int argc, char* args[] ) {
 	maindata lunadata;
 	
-	std::cout << "LunAPC V0.50\r\n";
+	std::cout << "LunAPC V0.51\r\n";
 	GameInit(&lunadata);
 
 	while(lunadata.gamestate != GAMESTATE_QUIT) {

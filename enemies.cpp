@@ -46,10 +46,7 @@ void EnemiesAddWave(struct maindata *lunadata) {
 		lunadata->enemies.CurrentEnemyType = lunadata->RandomNum & 7;
 		
 		RandomGet(lunadata);
-//		lunadata->enemies.CurrentWaveType = (lunadata->RandomNum & 7) + 1;
-lunadata->enemies.CurrentWaveType += 1;
-if(lunadata->enemies.CurrentWaveType > 8)
-	lunadata->enemies.CurrentWaveType = 1;
+		lunadata->enemies.CurrentWaveType = (lunadata->RandomNum & 7) + 1;
 		EnemiesDoWaveAction(lunadata, lunadata->enemies.CurrentWaveType, ENEMY_INIT);
 		
 		for(int i = 0; i < MAX_ENEMIES; i++) {
@@ -161,7 +158,6 @@ void EnemiesDoWaveAction(struct maindata *lunadata, int type, int action) {
 
 	type--;
 	if(action == ENEMY_INIT) {
-std::cout << "WAVE TYPE:" << type << std::endl;
 		switch(type) {
 			case 0:
 			case 1:
