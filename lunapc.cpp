@@ -11,7 +11,7 @@
 int main( int argc, char* args[] ) {
 	maindata lunadata;
 	
-	std::cout << "LunAPC V0.53\r\n";
+	std::cout << "LunAPC V0.54\r\n";
 	GameInit(&lunadata);
 
 	while(lunadata.gamestate != GAMESTATE_QUIT) {
@@ -53,6 +53,8 @@ void MainMenu(maindata *lunadata) {
 	lunadata->map.MinGap = 17;
 	lunadata->map.HscrollSpeed = 2;
 	lunadata->SPRITE_ENA = 0;
+	for(int i = 0; i < 8; i++)
+		lunadata->SPRITE_PTRS[i] = 0;
 	for(int i = 0; i < 40; i++) {
 		MapGenerateColumn(lunadata);
 		lunadata->map.NeedToShift = 1;
@@ -364,11 +366,13 @@ void GameDrawScreen(maindata *lunadata) {
 	for(int i = 7; i >= 0; i--) {
 		if(lunadata->SPRITE_ENA & ch) {
 			sp = lunadata->SPRITE_PTRS[i] - 64;
-			spsrc.x = (sp % 8) * SPRITETILE_WIDTH;
-			spsrc.y = (sp / 8) * SPRITETILE_HEIGHT;
-			spdest.x = (lunadata->SPRITE_X[i] - 0x18) * 2;
-			spdest.y = (lunadata->SPRITE_Y[i] - 0x32) * 2;
-			SDL_RenderCopy(lunadata->mainrend, lunadata->gamespritetex, &spsrc, &spdest);
+			if(sp >= 0) {
+				spsrc.x = (sp % 8) * SPRITETILE_WIDTH;
+				spsrc.y = (sp / 8) * SPRITETILE_HEIGHT;
+				spdest.x = (lunadata->SPRITE_X[i] - 0x18) * 2;
+				spdest.y = (lunadata->SPRITE_Y[i] - 0x32) * 2;
+				SDL_RenderCopy(lunadata->mainrend, lunadata->gamespritetex, &spsrc, &spdest);
+			}
 		}
 		ch = ch >> 1;
 	}

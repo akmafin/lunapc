@@ -110,7 +110,7 @@ void PlayerGetCollision(maindata *lunadata) {
 		SoundSfxExplode(lunadata);
 	} else {
 		for(int i = 0; i < MAX_ENEMIES; i++) {
-			if((lunadata->enemies.EnemyActive[i]) && ((abs(lunadata->SPRITE_X[0] - lunadata->SPRITE_X[i + 2]) < 12) && (abs(lunadata->SPRITE_Y[0] - lunadata->SPRITE_Y[i + 2]) < 10))) {
+			if((lunadata->enemies.EnemyActive[i]) && ((abs(lunadata->SPRITE_X[0] - lunadata->SPRITE_X[i + 2]) < 24) && (abs(lunadata->SPRITE_Y[0] - lunadata->SPRITE_Y[i + 2]) < 21))) {
 				lunadata->player.PlayerIsDead = 1;
 				SoundSfxExplode(lunadata);
 				break;

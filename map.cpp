@@ -1,7 +1,6 @@
 #include "lunapc.h"
 #include <iostream>
 void MapInit(maindata *lunadata) {
-RandomInit(lunadata);
 	lunadata->map.MapCols = -1;
 	MapChangeMapColors(lunadata);
 	ClearScreen(lunadata);
