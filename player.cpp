@@ -2,6 +2,7 @@
 
 void PlayerInit(maindata *lunadata) {
 	lunadata->SPRITE_ENA = 0xFD;
+	lunadata->SPRITE_PTRS[0] = lunadata->player.PlayerFrames[0];
 	lunadata->player.PlayerX[1] = 128;
 	lunadata->player.PlayerY[1] = 128;
 	lunadata->player.PlayerX[0] = 0;

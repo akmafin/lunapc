@@ -11,7 +11,7 @@
 int main( int argc, char* args[] ) {
 	maindata lunadata;
 	
-	std::cout << "LunAPC V0.51\r\n";
+	std::cout << "LunAPC V0.53\r\n";
 	GameInit(&lunadata);
 
 	while(lunadata.gamestate != GAMESTATE_QUIT) {
@@ -187,7 +187,7 @@ if(keystate[SDL_SCANCODE_W])
 void GameOver(maindata *lunadata) {
 	SDL_Event e;
 
-	Mix_PlayMusic(lunadata->sound.musicgameover, 0);
+	Mix_HaltMusic();
 	lunadata->map.HscrollSpeed = 0;
 	lunadata->DeathAnimIndex = 0;
 	CheckForHighscore(lunadata);
@@ -196,17 +196,48 @@ void GameOver(maindata *lunadata) {
 		GameDelay(lunadata);
 		GameDrawScreen(lunadata);
 		
+		lunadata->DeathAnimTimer[0]--;
+		if(lunadata->DeathAnimTimer[0] < 0) {
+			lunadata->DeathAnimTimer[0] = lunadata->DeathAnimTimer[1];
+			if(lunadata->DeathAnimIndex < 4) {
+				lunadata->DeathAnimIndex++;
+				lunadata->SPRITE_PTRS[0] = lunadata->DeathFrames[lunadata->DeathAnimIndex];
+				if(lunadata->DeathAnimIndex == 4)
+					Mix_PlayMusic(lunadata->sound.musicgameover, 0);
+			}
+		}
+		
 		BulletsClear(lunadata);
 		BulletsUpdate(lunadata);
-		
-		ClearStars(lunadata);
-		MapAdvanceMap(lunadata);
-		MapScreenShift(lunadata);
 		BulletsDraw(lunadata);
-		DrawStars(lunadata);
-		
-		EnemiesUpdate(lunadata);
-		EnemiesDraw(lunadata);
+
+		if(lunadata->DeathAnimIndex < 4) {
+			
+			ClearStars(lunadata);
+			MapAdvanceMap(lunadata);
+			MapScreenShift(lunadata);
+			DrawStars(lunadata);
+			
+			EnemiesUpdate(lunadata);
+			EnemiesDraw(lunadata);
+		} else {
+			lunadata->map.HscrollSpeed = 0;
+			lunadata->player.PlayerIsDead = 0;
+			lunadata->SPRITE_ENA = 0xFF;
+			for(int i = 0; i < 8; i++)
+				lunadata->SPRITE_PTRS[i] = 144 + i;
+			lunadata->GameOverSinTicker++;
+			if(lunadata->GameOverSinTicker > 255)
+				lunadata->GameOverSinTicker = 0;
+			
+			for(int i = 0; i < 4; i++)
+				lunadata->SPRITE_X[i] = 70 + i * 26;
+			for(int i = 4; i < 8; i++)
+				lunadata->SPRITE_X[i] = 94 + i * 26;
+			
+			for(int i = 0; i < 8; i++)
+				lunadata->SPRITE_Y[i] = lunadata->GameOverSinY[(i * 8 + lunadata->GameOverSinTicker) & 0xFF];
+		}
 		
 		while(SDL_PollEvent(&e)) {
 
@@ -278,6 +309,7 @@ void GameInit(maindata *lunadata) {
 		lunadata->enemies.SinY[6][i] = lunadata->enemies.SinY[0][i];
 		lunadata->enemies.SinY[7][i] = lunadata->enemies.SinY[3][i];
 		lunadata->enemies.SinX[7][i] = lunadata->enemies.SinX[3][i];
+		lunadata->GameOverSinY[i] = sin((i / 128.0) * (M_PI * 2)) * 0x18 + 0x80;
 	}
 }
 
