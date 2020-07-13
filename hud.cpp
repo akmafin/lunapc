@@ -1,4 +1,5 @@
 #include "lunapc.h"
+#include <stdio.h>
 
 void HudInit(struct maindata *lunadata) {
 	for(int i = 0; i < 40; i++) {

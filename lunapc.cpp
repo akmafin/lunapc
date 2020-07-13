@@ -1,5 +1,5 @@
 /*
- * LunAPC V0.02 2020-05-24
+ * LunAPC V0.56 2020-07-13
  * by AkmaFin
  */
 
@@ -11,7 +11,7 @@
 int main( int argc, char* args[] ) {
 	maindata lunadata;
 	
-	std::cout << "LunAPC V0.54\r\n";
+	std::cout << "LunAPC V0.56\r\n";
 	GameInit(&lunadata);
 
 	while(lunadata.gamestate != GAMESTATE_QUIT) {
@@ -29,6 +29,7 @@ int main( int argc, char* args[] ) {
 	}
 	
 	GameClean(&lunadata);
+	return 0;
 }
 
 void MainMenu(maindata *lunadata) {
@@ -84,6 +85,7 @@ void MainMenu(maindata *lunadata) {
 							break;
 							
 						case SDL_SCANCODE_RCTRL:
+						case SDL_SCANCODE_LCTRL:
 							lunadata->gamestate = GAMESTATE_RUNNING;
 							break;
 							
@@ -158,15 +160,15 @@ void GameLoop(maindata *lunadata) {
 
 		keystate=SDL_GetKeyboardState(NULL);
 		
-		if(keystate[SDL_SCANCODE_KP_8])
+		if((keystate[SDL_SCANCODE_KP_8]) || (keystate[SDL_SCANCODE_W]))
 			lunadata->player.Joy |= JOY_UP;
-		if(keystate[SDL_SCANCODE_KP_2])
+		if((keystate[SDL_SCANCODE_KP_2]) || (keystate[SDL_SCANCODE_S]))
 			lunadata->player.Joy |= JOY_DOWN;
-		if(keystate[SDL_SCANCODE_KP_4])
+		if((keystate[SDL_SCANCODE_KP_4]) || (keystate[SDL_SCANCODE_A]))
 			lunadata->player.Joy |= JOY_LEFT;
-		if(keystate[SDL_SCANCODE_KP_6])
+		if((keystate[SDL_SCANCODE_KP_6]) || (keystate[SDL_SCANCODE_D]))
 			lunadata->player.Joy |= JOY_RIGHT;
-		if(keystate[SDL_SCANCODE_RCTRL])
+		if((keystate[SDL_SCANCODE_RCTRL]) || (keystate[SDL_SCANCODE_LCTRL]))
 			lunadata->player.Joy |= JOY_FIRE;
 if(keystate[SDL_SCANCODE_Q])
 	lunadata->debugmode = 1;
@@ -253,6 +255,7 @@ void GameOver(maindata *lunadata) {
 							break;
 							
 						case SDL_SCANCODE_RCTRL:
+						case SDL_SCANCODE_LCTRL:
 							lunadata->gamestate = GAMESTATE_MENU;
 							break;
 							
@@ -299,19 +302,19 @@ void GameInit(maindata *lunadata) {
 	SoundInit(lunadata);
 	
 	for(int i = 0; i < 256; i++) {
-		lunadata->enemies.SinY[0][i] = sin((i / 256.0) * (M_PI * 2)) * 80 + 88 + 50;
+		lunadata->enemies.SinY[0][i] = (int)(sin((i / 256.0) * (M_PI * 2)) * 80 + 88 + 50);
 		lunadata->enemies.SinY[1][i] = lunadata->enemies.SinY[0][i];
 		lunadata->enemies.SinY[2][i] = lunadata->enemies.SinY[0][i];
-		lunadata->enemies.SinX[2][i] = (cos(((i - 1) / 128.0) * (M_PI * 2)) * 64 + 32) - (cos(( i / 128.0) * (M_PI * 2)) * 64 + 32);
-		lunadata->enemies.SinY[3][i] = sin((i / 128.0) * (M_PI * 2)) * 80 + 88 + 50;
-		lunadata->enemies.SinX[3][i] = (cos(((i - 1) / 64.0) * (M_PI * 2)) * 64 + 64) - (cos((i / 64.0) * (M_PI * 2)) * 64 + 64);
-		lunadata->enemies.SinY[4][i] = sin((i / 128.0) * (M_PI * 2) * 0.5) * 80 + 88 + 50;
-		lunadata->enemies.SinX[4][i] = ((cos(((i - 1) / 64.0) * (M_PI * 2)) * 64 + 64) - (cos((i / 64.0) * (M_PI * 2)) * 64 + 64)) / 2;
-		lunadata->enemies.SinX[5][i] = ((cos(((i - 1) / 128.0) * (M_PI * 2)) * 96 + 32) - (cos((i / 128.0) * (M_PI * 2)) * 96 + 32));
+		lunadata->enemies.SinX[2][i] = (int)((cos(((i - 1) / 128.0) * (M_PI * 2)) * 64 + 32) - (cos(( i / 128.0) * (M_PI * 2)) * 64 + 32));
+		lunadata->enemies.SinY[3][i] = (int)(sin((i / 128.0) * (M_PI * 2)) * 80 + 88 + 50);
+		lunadata->enemies.SinX[3][i] = (int)((cos(((i - 1) / 64.0) * (M_PI * 2)) * 64 + 64) - (cos((i / 64.0) * (M_PI * 2)) * 64 + 64));
+		lunadata->enemies.SinY[4][i] = (int)(sin((i / 128.0) * (M_PI * 2) * 0.5) * 80 + 88 + 50);
+		lunadata->enemies.SinX[4][i] = (int)(((cos(((i - 1) / 64.0) * (M_PI * 2)) * 64 + 64) - (cos((i / 64.0) * (M_PI * 2)) * 64 + 64)) / 2);
+		lunadata->enemies.SinX[5][i] = (int)(((cos(((i - 1) / 128.0) * (M_PI * 2)) * 96 + 32) - (cos((i / 128.0) * (M_PI * 2)) * 96 + 32)));
 		lunadata->enemies.SinY[6][i] = lunadata->enemies.SinY[0][i];
 		lunadata->enemies.SinY[7][i] = lunadata->enemies.SinY[3][i];
 		lunadata->enemies.SinX[7][i] = lunadata->enemies.SinX[3][i];
-		lunadata->GameOverSinY[i] = sin((i / 128.0) * (M_PI * 2)) * 0x18 + 0x80;
+		lunadata->GameOverSinY[i] = (int)(sin((i / 128.0) * (M_PI * 2)) * 0x18 + 0x80);
 	}
 }
 

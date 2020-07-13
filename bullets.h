@@ -5,7 +5,7 @@
 
 struct bullets {
 	int BulletIndex = 0;
-	int BulletType[MAX_BULLETS], BulletX[MAX_BULLETS], BulletY[MAX_BULLETS];
+	int BulletType[MAX_BULLETS] = {0}, BulletX[MAX_BULLETS] = {0}, BulletY[MAX_BULLETS] = {0};
 };
 
 void BulletsInit(struct maindata *lunadata);

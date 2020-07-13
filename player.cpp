@@ -18,6 +18,9 @@ void PlayerInit(maindata *lunadata) {
 	lunadata->player.PlayerDrawn = 8;
 	lunadata->player.PlayerFireTimer[0] = 10;
 	lunadata->player.PlayerFireTimer[1] = 10;
+	
+	lunadata->SPRITE_X[0] = 0;
+	lunadata->SPRITE_Y[0] = 0;
 }
 
 void PlayerUpdate(maindata *lunadata) {

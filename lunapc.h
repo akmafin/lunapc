@@ -28,7 +28,7 @@ struct maindata {
 	SDL_Window *mainwin;
 	SDL_Renderer *mainrend;
 	SDL_Texture *gamefonttex, *gamespritetex;
-	TTF_Font *font;
+//	TTF_Font *font;
 	int gamestate, IntroActive = 0;
 	int DeathAnimTimer[2] = {0, 4};
 	int DeathAnimIndex = 0, DeathFrames[5] = {68, 69, 70, 71, 67};
