@@ -1,5 +1,5 @@
 /*
- * LunAPC V0.56 2020-07-13
+ * LunAPC V0.70 2020-07-13
  * by AkmaFin
  */
 
@@ -11,7 +11,7 @@
 int main( int argc, char* args[] ) {
 	maindata lunadata;
 	
-	std::cout << "LunAPC V0.56\r\n";
+	std::cout << "LunAPC V0.70\r\n";
 	GameInit(&lunadata);
 
 	while(lunadata.gamestate != GAMESTATE_QUIT) {
@@ -42,7 +42,7 @@ void MainMenu(maindata *lunadata) {
 	Mix_PlayMusic(lunadata->sound.musicgame, -1);
 	MapInit(lunadata);
 	ClearScreen(lunadata);
-	
+
 /*	surf = TTF_RenderText_Solid(lunadata->font, "LunAPC", fg);
 	tex = SDL_CreateTextureFromSurface(lunadata->mainrend, surf);
 	SDL_RenderCopy(lunadata->mainrend, tex, NULL, &destrect);
@@ -65,9 +65,20 @@ void MainMenu(maindata *lunadata) {
 	DrawHighscore(lunadata);
 
 	while(lunadata->gamestate == GAMESTATE_MENU) {
+		lunadata->SCREEN[24 * 40 + 1] = 12;
+		lunadata->SCREEN[24 * 40 + 2] = 21;
+		lunadata->SCREEN[24 * 40 + 3] = 14;
+		lunadata->SCREEN[24 * 40 + 4] = 1;
+		lunadata->SCREEN[24 * 40 + 5] = 16;
+		lunadata->SCREEN[24 * 40 + 6] = 3;
+		lunadata->SCREEN[24 * 40 + 8] = 22;
+		lunadata->SCREEN[24 * 40 + 9] = 48;
+		lunadata->SCREEN[24 * 40 + 10] = 46;
+		lunadata->SCREEN[24 * 40 + 11] = 55;
+		lunadata->SCREEN[24 * 40 + 12] = 48;
 		GameDelay(lunadata);
 		GameDrawScreen(lunadata);
-		
+
 		lunadata->GameOverSinTicker++;
 		
 		MapAdvanceMap(lunadata);
