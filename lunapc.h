@@ -28,7 +28,6 @@ struct maindata {
 	SDL_Window *mainwin;
 	SDL_Renderer *mainrend;
 	SDL_Texture *gamefonttex, *gamespritetex;
-//	TTF_Font *font;
 	int gamestate, IntroActive = 0;
 	int DeathAnimTimer[2] = {0, 4};
 	int DeathAnimIndex = 0, DeathFrames[5] = {68, 69, 70, 71, 67};
@@ -38,6 +37,11 @@ struct maindata {
 	int ZP_COUNTER = 0;
 	int SPRITE_ENA = 0, SPRITE_PTRS[8] = {0}, SPRITE_X[8], SPRITE_Y[8];
 	int GameOverSinY[256] = {0};
+	int HighscoreAchieved = 0;
+	int MessageIndex = 0, MessageLength = 0;
+	char Hiscore[41] = "\0\0\0\0\0\0\0\0\0\0\0\0\x8\x9\x13\x3\xF\x12\x5\0\0\x30\x30\x30\x30\x30\x30\x30\0\0\0\0\0\0\0\0\0\0\0\0";
+	char HighScoreText[27] = "\0\0\x1F\x1F\x1F\0\xE\x5\x17\0\x8\x9\x7\x8\0\x13\x3\xF\x12\x5\0\x1F\x1F\x1F\0\0";
+	char MessageText[500] = {0};
 	uint32_t RandomNumState = 0x62;
 	struct bullets bullets;
 	struct enemies enemies;
@@ -45,7 +49,6 @@ struct maindata {
 	struct map map;
 	struct player player;
 	struct sound sound;
-int debugmode = 0;
 };
 
 void MainMenu(struct maindata *lunadata);
@@ -65,5 +68,7 @@ void DrawStars(struct maindata *lunadata);
 void ClearStars(struct maindata *lunadata);
 void CheckForHighscore(struct maindata *lunadata);
 void StopSounds(struct maindata *lunadata);
+unsigned char CharToDispChar(unsigned char inchr);
+int StrToDispStr(const char* instr, char* outstr, int outbuflen);
 
 #endif

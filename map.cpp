@@ -205,10 +205,30 @@ void MapAdvanceMap(maindata *lunadata) {
 
 void MapScreenShift(maindata *lunadata) {
 	if(lunadata->map.NeedToShift) {
-		for(int y = 0; y < 24; y++) {
+		if(lunadata->gamestate == GAMESTATE_MENU) {
+			for(int y = 2; y < 6; y++) {
+				for(int x = 1; x < 40; x++)
+					lunadata->SCREEN[y * 40 + x - 1] = lunadata->SCREEN[y * 40 + x];
+				lunadata->SCREEN[y * 40 + 39] = lunadata->map.ColData[y];
+			}
+			for(int y = 16; y < 23; y++) {
+				for(int x = 1; x < 40; x++)
+					lunadata->SCREEN[y * 40 + x - 1] = lunadata->SCREEN[y * 40 + x];
+				lunadata->SCREEN[y * 40 + 39] = lunadata->map.ColData[y];
+			}
 			for(int x = 1; x < 40; x++)
-				lunadata->SCREEN[y * 40 + x - 1] = lunadata->SCREEN[y * 40 + x];
-			lunadata->SCREEN[y * 40 + 39] = lunadata->map.ColData[y];
+				lunadata->SCREEN[24 * 40 + x - 1] = lunadata->SCREEN[24 * 40 + x];
+			
+			if(lunadata->MessageIndex >= lunadata->MessageLength)
+				lunadata->MessageIndex = 0;
+			lunadata->SCREEN[24 * 40 + 39] = lunadata->MessageText[lunadata->MessageIndex];
+			lunadata->MessageIndex++;
+		} else {
+			for(int y = 0; y < 24; y++) {
+				for(int x = 1; x < 40; x++)
+					lunadata->SCREEN[y * 40 + x - 1] = lunadata->SCREEN[y * 40 + x];
+				lunadata->SCREEN[y * 40 + 39] = lunadata->map.ColData[y];
+			}
 		}
 	}
 }

@@ -1,7 +1,10 @@
 /*
- * LunAPC V0.70 2020-07-13
+ * LunAPC V0.80 2020-07-15
  * by AkmaFin
  */
+
+#define SWVER			0
+#define SWREV			80
 
 #include <iostream>
 #include <chrono>
@@ -11,7 +14,8 @@
 int main( int argc, char* args[] ) {
 	maindata lunadata;
 	
-	std::cout << "LunAPC V0.70\r\n";
+	std::cout << "LunAPC V" << SWVER << "." << SWREV << "\r\n";
+	std::cout << "Running on " << SDL_GetPlatform() << "\n";
 	GameInit(&lunadata);
 
 	while(lunadata.gamestate != GAMESTATE_QUIT) {
@@ -34,26 +38,16 @@ int main( int argc, char* args[] ) {
 
 void MainMenu(maindata *lunadata) {
 	SDL_Event e;
-/*	SDL_Texture *tex;
-	SDL_Surface *surf;
-	SDL_Color fg = {(Uint8)64, (Uint8)64, (Uint8)255, 255};
-	SDL_Rect destrect = {0, 0, 100, 100};*/
 
 	Mix_PlayMusic(lunadata->sound.musicgame, -1);
 	MapInit(lunadata);
 	ClearScreen(lunadata);
 
-/*	surf = TTF_RenderText_Solid(lunadata->font, "LunAPC", fg);
-	tex = SDL_CreateTextureFromSurface(lunadata->mainrend, surf);
-	SDL_RenderCopy(lunadata->mainrend, tex, NULL, &destrect);
-	SDL_DestroyTexture(tex);
-	SDL_FreeSurface(surf);
-	SDL_RenderPresent(lunadata->mainrend);*/
-
 	lunadata->IntroActive = 1;
 	lunadata->map.MinGap = 17;
 	lunadata->map.HscrollSpeed = 2;
 	lunadata->SPRITE_ENA = 0;
+	lunadata->MessageIndex = lunadata->MessageLength - 35;
 	for(int i = 0; i < 8; i++)
 		lunadata->SPRITE_PTRS[i] = 0;
 	for(int i = 0; i < 40; i++) {
@@ -65,17 +59,6 @@ void MainMenu(maindata *lunadata) {
 	DrawHighscore(lunadata);
 
 	while(lunadata->gamestate == GAMESTATE_MENU) {
-		lunadata->SCREEN[24 * 40 + 1] = 12;
-		lunadata->SCREEN[24 * 40 + 2] = 21;
-		lunadata->SCREEN[24 * 40 + 3] = 14;
-		lunadata->SCREEN[24 * 40 + 4] = 1;
-		lunadata->SCREEN[24 * 40 + 5] = 16;
-		lunadata->SCREEN[24 * 40 + 6] = 3;
-		lunadata->SCREEN[24 * 40 + 8] = 22;
-		lunadata->SCREEN[24 * 40 + 9] = 48;
-		lunadata->SCREEN[24 * 40 + 10] = 46;
-		lunadata->SCREEN[24 * 40 + 11] = 55;
-		lunadata->SCREEN[24 * 40 + 12] = 48;
 		GameDelay(lunadata);
 		GameDrawScreen(lunadata);
 
@@ -181,10 +164,6 @@ void GameLoop(maindata *lunadata) {
 			lunadata->player.Joy |= JOY_RIGHT;
 		if((keystate[SDL_SCANCODE_RCTRL]) || (keystate[SDL_SCANCODE_LCTRL]))
 			lunadata->player.Joy |= JOY_FIRE;
-if(keystate[SDL_SCANCODE_Q])
-	lunadata->debugmode = 1;
-if(keystate[SDL_SCANCODE_W])
-	lunadata->debugmode = 0;
 	
 		PlayerUpdate(lunadata);
 		PlayerDraw(lunadata);
@@ -227,7 +206,6 @@ void GameOver(maindata *lunadata) {
 		BulletsDraw(lunadata);
 
 		if(lunadata->DeathAnimIndex < 4) {
-			
 			ClearStars(lunadata);
 			MapAdvanceMap(lunadata);
 			MapScreenShift(lunadata);
@@ -237,6 +215,12 @@ void GameOver(maindata *lunadata) {
 			EnemiesDraw(lunadata);
 		} else {
 			lunadata->map.HscrollSpeed = 0;
+			
+			if(lunadata->HighscoreAchieved) {
+				for(int i = 0; i < 26; i++)
+					lunadata->SCREEN[18 * 40 + 7 + i] = lunadata->HighScoreText[i];
+			}
+			
 			lunadata->player.PlayerIsDead = 0;
 			lunadata->SPRITE_ENA = 0xFF;
 			for(int i = 0; i < 8; i++)
@@ -289,15 +273,14 @@ void GameOver(maindata *lunadata) {
 void GameInit(maindata *lunadata) {
 	SDL_Surface *surf;
 	SDL_Rect rect = {16, 0, 608, 400};
+	char str[500];
 
 	SDL_Init(SDL_INIT_VIDEO);
+//	lunadata->mainwin = SDL_CreateWindow("LunAPC", 0, 0, 800, 600, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_SHOWN);
 	lunadata->mainwin = SDL_CreateWindow("LunAPC", 0, 0, 656, 400, SDL_WINDOW_SHOWN);
 	lunadata->mainrend = SDL_CreateRenderer(lunadata->mainwin, -1, SDL_RENDERER_ACCELERATED);
 	SDL_RenderSetClipRect(lunadata->mainrend, &rect);
 
-//	TTF_Init();
-//	lunadata->font=TTF_OpenFont("assets/Aileron-SemiBold.ttf", 32);
-	
 	IMG_Init(IMG_INIT_PNG);
 	surf = IMG_Load("assets/font.png");
 	lunadata->gamefonttex = SDL_CreateTextureFromSurface(lunadata->mainrend, surf);
@@ -327,6 +310,9 @@ void GameInit(maindata *lunadata) {
 		lunadata->enemies.SinX[7][i] = lunadata->enemies.SinX[3][i];
 		lunadata->GameOverSinY[i] = (int)(sin((i / 128.0) * (M_PI * 2)) * 0x18 + 0x80);
 	}
+
+	snprintf(str, 500, "     === LunAPC V%d.%d === by akmafin = running on %s = thanks to shallan, stepz, furroy and monstersgoboom for the c64 original = movement: WASD or numpad 2468 = fire: right or left CTRL", SWVER, SWREV, SDL_GetPlatform());
+	lunadata->MessageLength = StrToDispStr(str, lunadata->MessageText, sizeof(str));
 }
 
 void GameClean(maindata *lunadata) {
@@ -344,8 +330,7 @@ void GameClean(maindata *lunadata) {
 	SDL_DestroyTexture(lunadata->gamefonttex);
 	SDL_DestroyTexture(lunadata->gamespritetex);
 	IMG_Quit();
-//	TTF_CloseFont(lunadata->font);
-//	TTF_Quit();
+
 	SDL_DestroyRenderer(lunadata->mainrend);
 	SDL_DestroyWindow(lunadata->mainwin);
 	SDL_Quit();
@@ -354,18 +339,24 @@ void GameClean(maindata *lunadata) {
 void GameDrawScreen(maindata *lunadata) {
 	SDL_Rect chsrc = {0, 0, FONTTILE_WIDTH, FONTTILE_HEIGHT}, chdest = {0, 0, FONTTILE_WIDTH, FONTTILE_HEIGHT};
 	SDL_Rect spsrc = {0, 0, SPRITETILE_WIDTH, SPRITETILE_HEIGHT}, spdest = {0, 0, SPRITETILE_WIDTH, SPRITETILE_HEIGHT};
-	int ch, sp;
+	int ch, sp, firstrow = 0, lastrow = 23;
 
 	SDL_SetRenderDrawColor(lunadata->mainrend,0,0,0,SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(lunadata->mainrend);
 	SDL_SetRenderDrawBlendMode(lunadata->mainrend, SDL_BLENDMODE_NONE);
+
+	if(lunadata->gamestate == GAMESTATE_MENU) {
+		firstrow = 2;
+		lastrow = 24;
+	}
 	
 	for(int y = 0; y < 25; y++) {
 		for( int x = 0; x < 40; x++) {
 			ch = lunadata->SCREEN[y * 40 + x];
 			chsrc.x = (ch % 32) * FONTTILE_WIDTH;
 			chsrc.y = (ch / 32) * FONTTILE_HEIGHT;
-			if(y != 24)
+				chdest.x = x * FONTTILE_WIDTH;
+			if((y >= firstrow) && (y <= lastrow))
 				chdest.x = x * FONTTILE_WIDTH + lunadata->map.Hscroll * 2;
 			else
 				chdest.x = x * FONTTILE_WIDTH;
@@ -434,6 +425,8 @@ void RandomGet(struct maindata *lunadata) {
 }
 
 void DrawHighscore(struct maindata *lunadata) {
+	for(int i = 0; i < 40; i++)
+		lunadata->SCREEN[i] = lunadata->Hiscore[i];
 }
 
 void GenerateStars(struct maindata *lunadata) {
@@ -446,7 +439,53 @@ void ClearStars(struct maindata *lunadata) {
 }
 
 void CheckForHighscore(struct maindata *lunadata) {
+	lunadata->HighscoreAchieved = 0;
+	
+	for(int i = 0; i < 7; i++) {
+		if(lunadata->SCREEN[24 * 40 + 7 + i] > lunadata->Hiscore[21 + i])
+			lunadata->HighscoreAchieved = 1;
+	}
+	
+	if(lunadata->HighscoreAchieved) {
+		for(int i = 0; i < 7; i++)
+			lunadata->Hiscore[21 + i] = lunadata->SCREEN[24 * 40 + 7 + i];
+	}
 }
 
 void StopSounds(struct maindata *lunadata) {
+}
+
+unsigned char CharToDispChar(unsigned char inchr) {
+	unsigned char outchr = 0;
+
+	if ((inchr >= 'a') && (inchr <= 'z'))
+		outchr = inchr - 'a' + 1;
+	else if ((inchr >= 'A') && (inchr <= 'Z'))
+		outchr = inchr - 'A' + 1;
+	else if ((inchr >= '0') && (inchr <= '9'))
+		outchr = inchr - '0' + 48;
+	else if (inchr == ',')
+		outchr = 44;
+	else if (inchr == '.')
+		outchr = 46;
+	else if (inchr == '=')
+		outchr = 31;
+	else if (inchr == ':')
+		outchr = 33;
+
+	return outchr;
+}
+
+int StrToDispStr(const char *instr, char *outstr, int outbuflen) {
+	int len;
+
+	len = strlen(instr);
+	if (outbuflen < len)
+		len = outbuflen;
+
+	for (int i = 0; i < len; i++) {
+		outstr[i] = CharToDispChar(instr[i]);
+	}
+
+	return len;
 }
