@@ -42,6 +42,7 @@ struct maindata {
 	char Hiscore[41] = "\0\0\0\0\0\0\0\0\0\0\0\0\x8\x9\x13\x3\xF\x12\x5\0\0\x30\x30\x30\x30\x30\x30\x30\0\0\0\0\0\0\0\0\0\0\0\0";
 	char HighScoreText[27] = "\0\0\x1F\x1F\x1F\0\xE\x5\x17\0\x8\x9\x7\x8\0\x13\x3\xF\x12\x5\0\x1F\x1F\x1F\0\0";
 	char MessageText[500] = {0};
+	char IntroMap[400] = {0};
 	uint32_t RandomNumState = 0x62;
 	struct bullets bullets;
 	struct enemies enemies;
