@@ -10,10 +10,12 @@ void HudInit(struct maindata *lunadata) {
 void HudAddScore(struct maindata *lunadata, int value) {
 	char buf[8];
 
-	lunadata->hud.Score += value;
-	snprintf(buf, 8, "%07d", lunadata->hud.Score);
-	for(int i = 0; i < 7; i++)
-		lunadata->SCREEN[24 * 40 + 7 + i] = buf[i];
+	if(lunadata->player.PlayerIsDead == 0) {
+		lunadata->hud.Score += value;
+		snprintf(buf, 8, "%07d", lunadata->hud.Score);
+		for(int i = 0; i < 7; i++)
+			lunadata->SCREEN[24 * 40 + 7 + i] = buf[i];
+	}
 }
 
 void HudDisplayWaveNumber(struct maindata *lunadata) {

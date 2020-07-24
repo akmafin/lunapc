@@ -17,6 +17,8 @@ void SoundInit(maindata *lunadata) {
 			lunadata->sound.mixchunk[SOUND_SHOOT] = Mix_LoadWAV("assets/hallow-shoot.wav");
 			lunadata->sound.mixchunk[SOUND_EXPLODE] = Mix_LoadWAV("assets/hallow-explode.wav");
 			lunadata->sound.mixchunk[SOUND_BONUS] = Mix_LoadWAV("assets/hallow-bonus.wav");
+			lunadata->sound.mixchunk[SOUND_SCREAM] = Mix_LoadWAV("assets/hallow-scream.wav");
+			Mix_Volume(-1, MIX_MAX_VOLUME * 0.4);
 			
 			lunadata->sound.musicgame = Mix_LoadMUS("assets/hallow-music.ogg");
 			lunadata->sound.musicgameover = Mix_LoadMUS("assets/hallow-gameover.ogg");
@@ -45,4 +47,8 @@ void SoundSfxExplode(maindata *lunadata) {
 
 void SoundSfxBonus(maindata *lunadata) {
 	Mix_PlayChannel(lunadata->sound.sndchan[SOUND_BONUS], lunadata->sound.mixchunk[SOUND_BONUS], 0);
+}
+
+void SoundSfxScream(maindata *lunadata) {
+	Mix_PlayChannel(lunadata->sound.sndchan[SOUND_SCREAM], lunadata->sound.mixchunk[SOUND_SCREAM], 0);
 }

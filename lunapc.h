@@ -28,7 +28,8 @@ struct maindata {
 	SDL_Window *mainwin;
 	SDL_Renderer *mainrend;
 	SDL_Texture *gamefonttex, *gamespritetex;
-	int gamestate, IntroActive = 0;
+	SDL_GameController *gc;
+	int gamestate, IntroActive = 0, MusicActive = 1, fullscreen = 0;
 	int DeathAnimTimer[2] = {0, 4};
 	int DeathAnimIndex = 0, DeathFrames[5] = {68, 69, 70, 71, 67};
 	int GameOverFirePressed = 0, GameOverFireCountdown = 0, GameOverMusicTimer = 0;
@@ -42,7 +43,7 @@ struct maindata {
 	char Hiscore[41] = "\0\0\0\0\0\0\0\0\0\0\0\0\x8\x9\x13\x3\xF\x12\x5\0\0\x30\x30\x30\x30\x30\x30\x30\0\0\0\0\0\0\0\0\0\0\0\0";
 	char HighScoreText[27] = "\0\0\x1F\x1F\x1F\0\xE\x5\x17\0\x8\x9\x7\x8\0\x13\x3\xF\x12\x5\0\x1F\x1F\x1F\0\0";
 	char MessageText[500] = {0};
-	char IntroMap[400] = {0};
+	char IntroMap[440] = {0};
 	uint32_t RandomNumState = 0x62;
 	struct bullets bullets;
 	struct enemies enemies;

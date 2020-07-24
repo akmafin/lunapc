@@ -211,7 +211,7 @@ void MapScreenShift(maindata *lunadata) {
 					lunadata->SCREEN[y * 40 + x - 1] = lunadata->SCREEN[y * 40 + x];
 				lunadata->SCREEN[y * 40 + 39] = lunadata->map.ColData[y];
 			}
-			for(int y = 16; y < 23; y++) {
+			for(int y = 17; y < 23; y++) {
 				for(int x = 1; x < 40; x++)
 					lunadata->SCREEN[y * 40 + x - 1] = lunadata->SCREEN[y * 40 + x];
 				lunadata->SCREEN[y * 40 + 39] = lunadata->map.ColData[y];
