@@ -17,7 +17,7 @@ void EnemiesInit(struct maindata *lunadata) {
 		lunadata->enemies.EnemyDeathFrame[i] = 0;
 	};
 	lunadata->enemies.SectorTransition = 0x20;
-lunadata->enemies.CurrentWaveType = 0;
+	lunadata->enemies.CurrentWaveType = 0;
 }
 
 void EnemiesAddWave(struct maindata *lunadata) {
@@ -47,11 +47,11 @@ void EnemiesAddWave(struct maindata *lunadata) {
 		lunadata->enemies.CurrentEnemyType = lunadata->RandomNum & 7;
 		
 		RandomGet(lunadata);
-//		lunadata->enemies.CurrentWaveType = (lunadata->RandomNum & 7) + 1;
-lunadata->enemies.CurrentWaveType++;
+		lunadata->enemies.CurrentWaveType = (lunadata->RandomNum & 7) + 1;
+/*lunadata->enemies.CurrentWaveType++;
 if(lunadata->enemies.CurrentWaveType > 8)
 	lunadata->enemies.CurrentWaveType = 1;
-std::cout << "Enemy wave type: " << lunadata->enemies.CurrentWaveType << std::endl;
+std::cout << "Enemy wave type: " << lunadata->enemies.CurrentWaveType << std::endl;*/
 		EnemiesDoWaveAction(lunadata, lunadata->enemies.CurrentWaveType, ENEMY_INIT);
 		
 		for(int i = 0; i < MAX_ENEMIES; i++) {
