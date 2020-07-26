@@ -1,11 +1,12 @@
 #include "lunapc.h"
+#include <iostream>
 
 void SoundInit(maindata *lunadata) {
 	int init = Mix_Init(MIX_INIT_OGG);
 
 	if ((init&MIX_INIT_OGG) != MIX_INIT_OGG)
 	{
-		//std::cout << "Sound init failed: " << Mix_GetError();
+		std::cout << "ERROR: Sound init failed: " << Mix_GetError() << std::endl;
 		//sndena = false;
 	}
 	else
@@ -14,21 +15,26 @@ void SoundInit(maindata *lunadata) {
 		{
 			Mix_AllocateChannels(AUDIO_CHANNELS); // Amount of mixed sound channels
 			Mix_ReserveChannels(AUDIO_RESERVED_CHS); // How many channels to reserve for 'play on first free channel' (channel -1)
-			lunadata->sound.mixchunk[SOUND_SHOOT] = Mix_LoadWAV("assets/hallow-shoot.wav");
-			lunadata->sound.mixchunk[SOUND_EXPLODE] = Mix_LoadWAV("assets/hallow-explode.wav");
-			lunadata->sound.mixchunk[SOUND_BONUS] = Mix_LoadWAV("assets/hallow-bonus.wav");
-			lunadata->sound.mixchunk[SOUND_SCREAM] = Mix_LoadWAV("assets/hallow-scream.wav");
+			if((lunadata->sound.mixchunk[SOUND_SHOOT] = Mix_LoadWAV("assets/hallow-shoot.wav")) == 0)
+				std::cout << "ERROR: Cannot load shoot sound: " << Mix_GetError() << std::endl;
+			if((lunadata->sound.mixchunk[SOUND_EXPLODE] = Mix_LoadWAV("assets/hallow-explode.wav")) == 0)
+				std::cout << "ERROR: Cannot load explode sound: " << Mix_GetError() << std::endl;
+			if((lunadata->sound.mixchunk[SOUND_BONUS] = Mix_LoadWAV("assets/hallow-bonus.wav")) == 0)
+				std::cout << "ERROR: Cannot load bonus sound: " << Mix_GetError() << std::endl;
+			if((lunadata->sound.mixchunk[SOUND_SCREAM] = Mix_LoadWAV("assets/hallow-scream.wav")) == 0)
+				std::cout << "ERROR: Cannot load scream sound: " << Mix_GetError() << std::endl;
 			Mix_Volume(-1, MIX_MAX_VOLUME * 0.4);
 			
-			lunadata->sound.musicgame = Mix_LoadMUS("assets/hallow-music.ogg");
-			lunadata->sound.musicgameover = Mix_LoadMUS("assets/hallow-gameover.ogg");
-			//std::cout << "MUS" << music << Mix_GetError() << std::flush;
+			if((lunadata->sound.musicgame = Mix_LoadMUS("assets/hallow-music.ogg")) == 0)
+				std::cout << "ERROR: Cannot load main music: " << Mix_GetError() << std::endl;
+			if((lunadata->sound.musicgameover = Mix_LoadMUS("assets/hallow-gameover.ogg")) == 0)
+				std::cout << "ERROR: Cannot load gameover music: " << Mix_GetError() << std::endl;
 			Mix_VolumeMusic(MIX_MAX_VOLUME * 0.9);
 			//sndena = true;
 		}
 		else
 		{
-			//std::cout << "Unable to init sound source: " << Mix_GetError();
+			std::cout << "ERROR: Unable to init sound source: " << Mix_GetError() << std::endl;
 			//sndena = false;
 		}
 	}

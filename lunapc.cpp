@@ -1,10 +1,10 @@
 /*
- * LunAPC V0.88 2020-07-23
+ * LunAPC V0.89 2020-07-24
  * by AkmaFin
  */
 
 #define SWVER			0
-#define SWREV			88
+#define SWREV			89
 
 #include <iostream>
 #include <chrono>
@@ -389,7 +389,7 @@ void GameInit(maindata *lunadata) {
 		lunadata->GameOverSinY[i] = (int)(sin((i / 128.0) * (M_PI * 2)) * 0x18 + 0x80);
 	}
 
-	snprintf(str, 500, "     === LunAPC V%d.%d === by akmafin in 2020 = world premiere version = running on %s = thanks to shallan, stepz, furroy and monstersgoboom for the c64 original = movement: WASD, cursor keys or numpad 2468 = fire: right or left CTRL or C = F1: toggle fullscreen", SWVER, SWREV, SDL_GetPlatform());
+	snprintf(str, 500, "     === LunAPC V%d.%d === by akmafin in 2020 = test version 2, not for playing = running on %s = thanks to shallan, stepz, furroy and monstersgoboom for the c64 original = movement: WASD, cursor keys or numpad 2468 = fire: right or left CTRL or C = F1: toggle fullscreen", SWVER, SWREV, SDL_GetPlatform());
 	lunadata->MessageLength = StrToDispStr(str, lunadata->MessageText, sizeof(str));
 
 	for(int i = 0; i < 440; i++)
