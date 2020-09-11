@@ -18,6 +18,13 @@ struct enemies {
 	int EnemyFrameCount[6] = {10, 6, 4, 4, 4, 4};
 	int SectorTransition = 0, SinTicker[8] = {0};
 	int SinX[8][256] = {{0}}, SinY[8][256] = {{0}};
+	int EnemyWaveTypes[MAX_ENEMIES][8] = {
+		{1, 0, 0, 0, 0, 1, 0, 0},
+		{0, 0, 0, 1, 0, 0, 0, 1},
+		{0, 1, 1, 0, 1, 0, 0, 0},
+		{0, 0, 0, 1, 0, 0, 1, 1},
+		{1, 0, 0, 0, 0, 1, 0, 0},
+		{0, 0, 0, 1, 0, 0, 0, 1} };
 };
 
 void EnemiesInit(struct maindata *lunadata);

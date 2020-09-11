@@ -4,7 +4,7 @@
  */
 
 #define SWVER			0
-#define SWREV			89
+#define SWREV			90
 
 #include <iostream>
 #include <chrono>
@@ -355,6 +355,7 @@ void GameInit(maindata *lunadata) {
 	};
 
 	SDL_Init(SDL_INIT_VIDEO);
+	SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
 	lunadata->mainwin = SDL_CreateWindow("LunAPC", 0, 30, 800, 600, SDL_WINDOW_SHOWN);
 	lunadata->mainrend = SDL_CreateRenderer(lunadata->mainwin, -1, SDL_RENDERER_ACCELERATED);
 	SDL_RenderSetClipRect(lunadata->mainrend, &rect);
@@ -389,20 +390,21 @@ void GameInit(maindata *lunadata) {
 		lunadata->GameOverSinY[i] = (int)(sin((i / 128.0) * (M_PI * 2)) * 0x18 + 0x80);
 	}
 
-	snprintf(str, 500, "     === LunAPC V%d.%d === by akmafin in 2020 = running on %s = thanks to shallan, stepz, furroy and monstersgoboom for the c64 original = movement: WASD, cursor keys or numpad 2468 = fire: right or left CTRL or C = F1: toggle fullscreen", SWVER, SWREV, SDL_GetPlatform());
+	snprintf(str, 500, "     === LunAPC V%d.%d enemy wave test edition === by akmafin in 2020 = running on %s = thanks to shallan, stepz, furroy and monstersgoboom for the c64 original = movement: WASD, cursor keys or numpad 2468 = fire: right or left CTRL or C = F1: toggle fullscreen", SWVER, SWREV, SDL_GetPlatform());
 	lunadata->MessageLength = StrToDispStr(str, lunadata->MessageText, sizeof(str));
 
 	for(int i = 0; i < 440; i++)
 		lunadata->IntroMap[i] = title[i];
 
-//	lunadata->gc = SDL_GameControllerOpen(0);
+//	std::cout << SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt") << "\n";
+	lunadata->gc = SDL_GameControllerOpen(0);
 //	std::cout << lunadata->gc << std::endl;
 //	std::cout << SDL_NumJoysticks() << std::endl;
 }
 
 void GameClean(maindata *lunadata) {
-//	if (lunadata->gc)
-//		SDL_GameControllerClose(lunadata->gc);
+	if (lunadata->gc)
+		SDL_GameControllerClose(lunadata->gc);
 
 	Mix_HaltMusic();
 	if(lunadata->sound.musicgame)
@@ -421,6 +423,7 @@ void GameClean(maindata *lunadata) {
 
 	SDL_DestroyRenderer(lunadata->mainrend);
 	SDL_DestroyWindow(lunadata->mainwin);
+	SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
 	SDL_Quit();
 }
 

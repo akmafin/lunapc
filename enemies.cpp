@@ -45,9 +45,11 @@ void EnemiesAddWave(struct maindata *lunadata) {
 			RandomGet(lunadata);
 		} while ((lunadata->RandomNum & 7) >= 6);
 		lunadata->enemies.CurrentEnemyType = lunadata->RandomNum & 7;
-		
-		RandomGet(lunadata);
-		lunadata->enemies.CurrentWaveType = (lunadata->RandomNum & 7) + 1;
+
+		do {
+			RandomGet(lunadata);
+			lunadata->enemies.CurrentWaveType = (lunadata->RandomNum & 7) + 1;
+		} while (lunadata->enemies.EnemyWaveTypes[lunadata->enemies.CurrentEnemyType][lunadata->enemies.CurrentWaveType] == 0);
 /*lunadata->enemies.CurrentWaveType++;
 if(lunadata->enemies.CurrentWaveType > 8)
 	lunadata->enemies.CurrentWaveType = 1;
